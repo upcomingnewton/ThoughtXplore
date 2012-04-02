@@ -1,5 +1,6 @@
 from django.db import models
 from ThoughtXplore.txUser.models import User, UserGroup 
+from ThoughtXplore.txMisc.models import PermissionContentType
 from ThoughtXplore.txEmails.DatabaseFunctions import DBInsertEmailTemplate, DBInsertmail
     
 class EmailMessageTypes(models.Model):
@@ -8,9 +9,7 @@ class EmailMessageTypes(models.Model):
     url =models.CharField(max_length=200)
     addninfo = models.CharField(max_length=100)
     
-
         
-    
 class EmailTemplate(models.Model):
     
     EmailType=models.ForeignKey(EmailMessageTypes)
@@ -18,16 +17,8 @@ class EmailTemplate(models.Model):
     TemplateFormat=models.TextField()
     paramList=models.TextField()
     Author=models.ForeignKey(User)
-    def dbInsertEmailTemplates(self,EmailType, TemplateName, TemplateFormat, paramList, Author):
-        emailtemplate={
-                   'EmailType': EmailType,
-                   'TemplateName': TemplateName,
-                   'TemplateFormat':TemplateFormat,
-                   'paramList':paramList,
-                   'Author':Author                   
-                   }
-        return DBInsertEmailTemplate(emailtemplate)
-  
+    
+
 
 class Emails(models.Model):
 
@@ -42,21 +33,15 @@ class Emails(models.Model):
     ToUserIDs=models.TextField()
     ToUserEmails= models.TextField()
     
-    def mailInsertdb(self,FromUserID, fromuseremail, EmailTypeID,TemplateID,Subject,ParameterDict, togroupIDs, touserIDs, ToUserEmails): 
-        print "here1"
-        sent_message={
-                       'FromUserID': FromUserID,
-                       'FromUserEmail': str(fromuseremail), 
-                       'EmailTypeID':EmailTypeID,
-                       'TemplateID': TemplateID,
-                       'Subject':Subject,
-                       'ParameterDict': ParameterDict,
-                       'ToGroupIDs':togroupIDs,
-                       'ToUserIDs':touserIDs,
-                       'ToUserEmails':ToUserEmails
-                               }
-        
-        print sent_message
-        return DBInsertmail(sent_message)
+    
 
-   
+class EmailLogs(models.Model):
+    # user making changes
+    LogsUser = models.ForeignKey(User)
+    # row id being changed
+    LogsObject = models.IntegerField()
+    LogsPCI = models.ForeignKey(PermissionContentType)
+    LogsIP = models.CharField(max_length=20)
+    LogsTimeStamp = models.DateTimeField()
+    LogsDescription = models.CharField(max_length=200)
+    LogsPreviousState = models.CharField(max_length=5000)

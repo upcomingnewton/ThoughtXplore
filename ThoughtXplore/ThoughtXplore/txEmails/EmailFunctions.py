@@ -1,15 +1,28 @@
 from ThoughtXplore.txEmails.models import Emails, EmailMessageTypes, EmailTemplate
-
+from ThoughtXplore.txEmails.DatabaseFunctions import DBInsertmail, DBInsertEmailTemplate
 class EmailFunx(Emails, EmailMessageTypes,EmailTemplate):
     
 
-    def DBInsertEmailTemplates(self, EmailType, TemplateName, TemplateFormat_, paramList_, authorID):
-        return EmailTemplate.dbInsertEmailTemplates(self, EmailType, TemplateName, TemplateFormat_, paramList_, authorID)
-        
-        
-      
-    def DBmailInsert(self, fromUserID,from_, EmailTypeID,TemplateID,Subject,paramList,to_group_list, to_id_list_, to_email_list_):
-    
-        message= Emails()
-        message.mailInsertdb( fromUserID,from_, EmailTypeID,TemplateID,Subject,paramList,to_group_list, to_id_list_, to_email_list_)
-        
+    def dbInsertEmailTemplates(self,EmailType, TemplateName, TemplateFormat, paramList, Author):
+        emailtemplate={
+                   'EmailType': EmailType,
+                   'TemplateName': TemplateName,
+                   'TemplateFormat':TemplateFormat,
+                   'paramList':paramList,
+                   'Author':Author                   
+                   }
+        return DBInsertEmailTemplate(emailtemplate)
+    def mailInsertDB(self,FromUserID, fromuseremail, EmailTypeID,TemplateID,Subject,ParameterDict, togroupIDs, touserIDs, ToUserEmails): 
+        print "here1"
+        sent_message={
+                       'FromUserID': FromUserID,
+                       'FromUserEmail': str(fromuseremail), 
+                       'EmailTypeID':EmailTypeID,
+                       'TemplateID': TemplateID,
+                       'Subject':Subject,
+                       'ParameterDict': ParameterDict,
+                       'ToGroupIDs':togroupIDs,
+                       'ToUserIDs':touserIDs,
+                       'ToUserEmails':ToUserEmails
+                               }     
+        return DBInsertmail(sent_message)

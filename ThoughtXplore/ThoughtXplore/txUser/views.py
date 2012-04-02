@@ -58,4 +58,4 @@ def LoginUser(HttpRequest):
     user = UserFnx()
     user.LoginUser(emailid, password, 'testsite', HttpRequest.META['REMOTE_ADDR'])
     # password_disp1=encdec.safe_unicode(password)
-    return HttpResponse("login details are : emailid : %s and pass : %s : and pass: %s"%(emailid))
+    return HttpResponse("login details are : emailid : %s"%(emailid))
