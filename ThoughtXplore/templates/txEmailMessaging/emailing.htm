@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>{{ title }}</title>
+</head>
+<body>
+<p>Folder List</p>
+<hr>
+{% for item in Folders %}
+<p>{{ item.name}}</p>
+{% endfor %}
+
+<table>
+<th>User-IDs</th>
+{% for item in Users %}
+	<tr>
+	<td>{{item.id}}-</td><td>{{item.UserFirstName}} {{item.UserLastName}}</td>
+	</tr>
+{% endfor %}
+
+</table>
+
+<form action="/messaging/email/" method="POST">
+<hr>
+<p>From User:
+<select name="fromUserID" id="id_fromUserID" title="From User">
+	{% for item in Users %}
+	<option value={{item.id}}>{{item.UserFirstName}}</option>
+	{% endfor %}
+</select></p>    
+
+
+
+<p><label for="to_id_list">To_Custom_User_IDs_List:</label>
+    <input type="text" name="to_id_list" id="to_id_list" /></p>
+<p><label for="groupIDs">Group_IDs:</label>
+    <input type="text" name="groupIDs" id="id_groupIDs" /></p>
+<p><label for=subject>Subject:</label>
+    <textarea cols="40" rows="5" name="subject" id="id_subject" ></textarea></p>
+<p><label for=subject>Message:</label>
+    <input type="textArea" name="message" id="id_message" /></p>
+<input type="submit" value="Submit" />
+</form>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+CREATE OR REPLACE FUNCTION txUser_user_edit(
+user_id INTEGER,
+email VARCHAR,
+pass VARCHAR,
+fname VARCHAR,
+mname VARCHAR,
+lname VARCHAR,
+gender VARCHAR,
+bday DATE,
+entity_id INTEGER,
+state_id INTEGER,
+by_user VARCHAR,
+ip VARCHAR,
+logdesc VARCHAR,
+logprevstate VARCHAR,
+OUT result_index INTEGER
+) RETURNS INTEGER AS $$
+DECLARE 
+    recid INTEGER;
+    varrec RECORD;
+    temp INTEGER;
+BEGIN 
+temp := 0;
+/*
+1. check if user exists or not 
+2. if does not exists , then check for all contraints 
+3. insert data
+4. check for inserted data
+5. insert logs , check for logs and commit
+*/
+
+
+IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=email) THEN
+	result_index := -676;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+
+
+/*  2. check if requesting user has right to update this user  */
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','user','UPDATE');
+IF varrec.status <> 500 THEN
+	result_index := varrec.status;
+	RETURN;
+END IF;
+
+/*  3. UPDATE DATA INTO USER TABLE */
+UPDATE "txUser_user"
+SET "UserEmail" = email,
+	"UserPassword" = pass,
+	"UserFirstName" = fname,
+	"UserMiddleName" = mname,
+	"UserLastName" = lname,
+	"UserGender" = gender,
+	"UserBirthDate" = bday,
+	"UserEntity_id" = entity_id,
+	"SCI_id" = state_id
+WHERE id = user_id;
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	result_index := -678;
+        RETURN;
+END IF;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,user_id,now(),ip,logdesc,logprevstate);
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	result_index := -679;
+        RETURN;
+ELSE
+	result_index := 675;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

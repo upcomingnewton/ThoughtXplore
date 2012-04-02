@@ -1,0 +1,57 @@
+CREATE OR REPLACE FUNCTION two_system_initialize_user_system() RETURNS VOID AS $$
+DECLARE
+ var_per INTEGER;
+ var_ct INTEGER;
+ var_pci RECORD;
+ var_state_active INTEGER;
+ var_state_delete INTEGER;
+ var_per_insert INTEGER;
+ var_per_delete INTEGER;
+ var_per_update INTEGER;
+ group_index INTEGER;
+ var_user INTEGER;
+ BEGIN
+DELETE FROM "txUser_grouppci";
+ SELECT id INTO var_state_active FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE';  
+ SELECT id INTO var_state_delete FROM "txMisc_miscstate" WHERE "StateName"='DELETED'; 
+ SELECT id INTO group_index FROM "txUser_group" WHERE "GroupName"='superusers';
+ RAISE NOTICE 'STATE TABLE : active = %, deleted = %',var_state_active,var_state_delete;
+ SELECT id INTO var_per_insert FROM "txMisc_miscpermission" WHERE "PermissionName"='INSERT';  
+ SELECT id INTO var_per_delete FROM "txMisc_miscpermission" WHERE "PermissionName"='DELETE'; 
+ SELECT id INTO var_per_update FROM "txMisc_miscpermission" WHERE "PermissionName"='UPDATE'; 
+ RAISE NOTICE 'PERMISSION TABLE : insert = %, update = %, delete=%',var_per_insert,var_per_update,var_per_delete;
+  <<grouppci>>
+  FOR var_pci IN SELECT * FROM "txMisc_permissioncontenttype" LOOP
+    var_ct := var_pci."PermissionContentType_id";
+    var_per := var_pci."Permission_id";
+    IF (var_per = var_per_insert) THEN 
+    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+    END IF;
+    IF (var_per = var_per_update) THEN 
+    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+    END IF;
+    IF (var_per = var_per_delete) THEN 
+    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+    END IF;
+  	RAISE NOTICE 'permission id : %, content_type : %',var_per,var_ct;
+  END LOOP grouppci;
+  
+  
+  SELECT id INTO var_user FROM django_content_type WHERE app_label='txUser' AND model='user';
+  INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+    						   VALUES(group_index,(SELECT id FROM "txMisc_permissioncontenttype" WHERE "Permission_id"=(SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='USER_AU') AND "PermissionContentType_id"=var_user AND "PermissionActive"=1 ),(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_user AND "State_id"=(SELECT id  FROM "txMisc_miscstate" WHERE "StateName"='AUTHENTICATED') AND "StateActive"=1),1);
+  INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+								VALUES(group_index,(SELECT id FROM "txMisc_permissioncontenttype" WHERE "Permission_id"=(SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='ADMIN_AU') AND "PermissionContentType_id"=var_user AND "PermissionActive"=1 ),(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_user AND "State_id"=(SELECT id  FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE') AND "StateActive"=1),1);
+  INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+								VALUES(group_index,(SELECT id FROM "txMisc_permissioncontenttype" WHERE "Permission_id"=(SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='LOCK') AND "PermissionContentType_id"=var_user AND "PermissionActive"=1 ),(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_user AND "State_id"=(SELECT id  FROM "txMisc_miscstate" WHERE "StateName"='LOCKED') AND "StateActive"=1),1);
+
+
+  UPDATE "txUser_grouppci" 
+  SET "ResultingSCI_id"= (SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_user AND "State_id"=(SELECT id  FROM "txMisc_miscstate" WHERE "StateName"='CREATED') AND "StateActive"=1)
+  WHERE ("Group_id"=group_index) AND ("PCI_id"=(SELECT id FROM "txMisc_permissioncontenttype" WHERE "Permission_id"=var_per_insert AND "PermissionContentType_id"=var_user AND "PermissionActive"=1 ));				
+  RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_grouppci is % ',(SELECT COUNT(id) FROM "txUser_grouppci");
+END;
+$$ LANGUAGE plpgsql;

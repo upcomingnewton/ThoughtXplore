@@ -1,0 +1,116 @@
+body
+{
+    margin:0;
+    padding:0;
+    outline:0;
+    border:0;
+    background:transparent;
+    font-family : Segoe UI, tahoma, arial, sans-serif;
+}
+
+.center
+{
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.border_left
+{
+    border-left-color:#cccccc;
+    border-left-style:solid;
+    border-left-width:1px;
+}
+
+.border_right
+{
+    border-right-color:#cccccc;
+    border-right-style:solid;
+    border-right-width:1px;
+}   
+
+.border_bottom
+{
+    border-bottom-color:#cccccc;
+    border-bottom-style:solid;
+    border-bottom-width:1px;
+}
+
+.width1000
+{
+    width:1000px;
+}
+
+.width140
+{
+    width:150px;
+}
+
+.width290
+{
+    width:290px;
+}
+
+.width550
+{
+    width:550px;
+}
+
+.height500
+{
+    height:500px;
+}
+
+.height20
+{
+    height:25px;
+    margin-bottom:5px;
+    
+}
+
+.height5
+{
+    height:5px;
+}
+
+.float_left
+{
+    float:left;
+}
+
+.hor_sep_10
+{
+    width: 8px;
+}
+
+
+
+.tb1
+{
+    background-image: url('../images/input_form_bg.jpg');
+    background-repeat: repeat-x;
+    border: 1px solid #d1c7ac;
+    width: 295px;
+    color: #333333;
+    padding: 2px;
+    height:20px;
+    margin-right: 4px;
+    font-size: 14px;
+
+}
+
+.tb2
+{
+    background-image: url('../images/input_form_bg.jpg');
+    background-repeat: repeat-x;
+    border: 1px solid #d1c7ac;
+    width: 300px;
+    color: #333333;
+    padding: 2px;
+    height:26px;
+}
+
+
+.font_all
+{
+    
+}

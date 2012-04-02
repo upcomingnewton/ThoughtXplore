@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>{{ title }}</title>
+</head>
+<body>
+
+<form action="/files/upload/status/" method="POST" enctype="multipart/form-data">
+
+<p>User Name:
+<select name="cuser" id="id_cuser" title="User Name">
+	{% for item in Users %}
+	<option value={{item.id}}>{{item.UserFirstName}}</option>
+	{% endfor %}
+</select></p> 
+   
+<p>Title:<input type="text" id="id_filename" name="filename" /></p><br>
+<select name="folder_" id="id_folder" title="Select Folder">
+	{% for item in Folders %}
+	<option value={{item.id}}>{{item.name}}</option>
+	{% endfor %}
+</select></p> 
+<p>Description:<input type="text" id= "id_desc" name= "desc"/></p><br>
+  
+<select name="filetype" id="id_filetype" title="Select FileType">
+	{% for item in FileType %}
+	<option value={{item.id}}>{{item.typeName}}</option>
+	{% endfor %}
+</select></p>   
+    <input type="file" id="file" name="file" />
+  
+
+<input type="submit" value="Submit" />
+</form>
+</body>
+
+</html>

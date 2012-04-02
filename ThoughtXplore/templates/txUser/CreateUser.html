@@ -1,0 +1,100 @@
+{% extends "master1.html" %}
+{% block title %}{{ title }}{% endblock%}
+{% block start_script %}
+	$('#RegisterUser_dob').datepicker({
+			changeMonth: true,
+			changeYear: true,
+			minDate : new Date(1985,1,1,0,0,0,0),
+			maxDate : new Date(1995,21,31,23,59,59,0),
+	});
+
+{% endblock %}
+{% block add_start_script %}
+    <link type="text/css" href="{{STATIC_URL}}css/ui-lightness/jquery-ui-1.8.18.custom.css" rel="stylesheet" />	
+	<script type="text/javascript" src="{{STATIC_URL}}js/jquery-ui-1.8.18.custom.min.js"></script>
+{% endblock %}
+{% block master_content_center %}
+		<form  action="/user/register/register/" method="post">
+		{% csrf_token %}
+		<!--  email  -->
+			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input id="RegisterUser_email" name="RegisterUser_email" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Enter your email id
+                     </div>
+                </div>
+     	<!--  password  -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="RegisterUser_pass" id="RegisterUser_pass" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Choose a password
+                     </div>
+                </div>
+     	<!-- first name -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="RegisterUser_fname" id="RegisterUser_fname" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Enter your first name
+                     </div>
+                </div>
+    	<!--  middle name -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="RegisterUser_mname" id="RegisterUser_mname" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Enter your middle name
+                     </div>
+                </div>
+      	<!-- last name -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="RegisterUser_lname" id="RegisterUser_lname" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Enter your last name
+                     </div>
+                </div>
+     	<!-- date of birth -->
+     			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="RegisterUser_dob" id="RegisterUser_dob" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             dob (mm/dd/yyyy)
+                     </div>
+                </div>
+    	<!--  gender -->
+    			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <select name="RegisterUser_gender" id="RegisterUser_gender"  class="tb2" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" >
+                             		<option value="">select</option>
+									<option value="M">male</option>
+									<option value="F">female</option>
+                             </select>
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             gender
+                     </div>
+                </div>
+      	<!--  submit -->
+      			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;" >
+                     <input type="submit" value="REGISTER USER" />
+                </div>
+		
+		</form>
+{% endblock %}
+

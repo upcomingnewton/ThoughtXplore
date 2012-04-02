@@ -1,0 +1,23 @@
+<html>
+<title>{{ title }}</title>
+
+<body>
+
+<form action="/contact/" method="post">
+{% csrf_token %}
+
+<p><label for="id_subject">Subject:</label>
+    <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+<p><label for="id_message">Message:</label>
+    <input type="text" name="message" id="id_message" /></p>
+<p><label for="id_sender">Sender:</label>
+    <input type="text" name="sender" id="id_sender" /></p>
+<p><label for="id_cc_myself">Cc myself:</label>
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+<input type="submit" value="Submit" />
+
+</form>
+
+
+</body>
+</html>

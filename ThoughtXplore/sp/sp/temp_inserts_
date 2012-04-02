@@ -1,0 +1,76 @@
+
+/*insert a new file*/
+
+CREATE OR REPLACE FUNCTION insert_filetype(type_name text, type_desc text) RETURNS VOID AS $$
+  
+DECLARE
+  id INTEGER;  
+BEGIN 
+ id=0;
+ SELECT max(t."id") INTO id from "txFileSystem_filetypes" t;
+ IF id<>0 THEN
+ 	id=id+1;
+ ELSE
+    id= 1;
+ END IF;
+ INSERT INTO "txFileSystem_filetypes" values (id,type_name, type_desc); 
+ 
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+/*insert a new folder-creater*/
+
+CREATE OR REPLACE FUNCTION txFileSystem_insert_folder_creater(folder_id_ INTEGER, creater_id_ INTEGER) RETURNS VOID AS $$
+ 
+BEGIN 
+  INSERT INTO "txFileSystem_creater_user"("folder_id_id", "creater_uid_id") values (folder_id_, creater_id_); 
+ 
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+/*insert a new file*/
+
+
+CREATE OR REPLACE FUNCTION insert_files(name text, file_desc text, file_url text, folder_id INTEGER, size INTEGER, file_type INTEGER, user_created INTEGER, FileSCI INTEGER) RETURNS VOID AS $$
+  
+DECLARE
+  file_id INTEGER;
+    
+BEGIN 
+ file_id=0;
+ SELECT max(t1."id") INTO file_id from "txFileSystem_Files_Basics" t1;
+ IF file_id<>0 THEN
+ 	file_id=file_id+1;
+ ELSE
+    file_id= 1;
+ END IF;
+ 
+ INSERT INTO "txFileSystem_Files_Basics" values (file_id,name, file_desc, file_url,folder_id, size, file_type, user_created, FileSCI); 
+ 
+ 
+END;
+$$ LANGUAGE plpgsql;
+
+
+/*initialize temp files*//*
+CREATE OR REPLACE FUNCTION insert_files() RETURNS VOID AS $$
+	
+BEGIN
+ SELECT insert_folder('RESUME_CSE_UIET', 'Resume of CSE, UIET','/resumes/cse', 1, 4590, );	
+ SELECT insert_files('RESUME_UE83082', 'Resume UE83082','/resumes/cse', 1, 4590, );	
+ SELECT insert_files('RESUME_UE83082', 'Resume UE83082','/resumes/cse', 1, 4590, );	
+ 
+ ____INCOMPLETE
+
+*/
+
+
+

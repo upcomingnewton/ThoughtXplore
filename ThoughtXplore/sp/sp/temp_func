@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION temp_func() RETURNS VOID AS $$
+
+BEGIN
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(17, 18, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(18, 18, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(19, 18, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(20, 19, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(21, 19, 1);
+
+ 
+END;
+$$ LANGUAGE plpgsql;
+ 

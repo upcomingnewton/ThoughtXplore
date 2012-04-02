@@ -1,0 +1,56 @@
+CREATE OR REPLACE FUNCTION checkstatus
+(
+	tablename VARCHAR,
+	req_state VARCHAR,
+	recid INTEGER,
+	OUT scid INTEGER,
+	OUT result INTEGER
+) RETURNS RECORD AS $$
+DECLARE
+	django_ctype INTEGER;
+	stateid INTEGER;
+	state_content_type INTEGER;
+	app VARCHAR;
+	mod VARCHAR;
+BEGIN 
+/*
+1. check for login type
+2. check for existence of user
+3. check if user is active
+
+*/
+SELECT * INTO app FROM split_part(tablename,'_',1);
+SELECT * INTO mod FROM split_part(tablename,'_',2);
+RAISE NOTICE '== % == % == ',app,mod;
+SELECT id INTO django_ctype FROM django_content_type WHERE app_label=app AND model=mod;
+IF NOT EXISTS (SELECT id FROM "txMisc_miscstate" WHERE "StateName"=req_state) THEN
+	result := -1001;
+	scid := -1;
+	RETURN;
+END IF;
+SELECT id INTO stateid FROM "txMisc_miscstate" WHERE "StateName"=req_state;  
+
+IF NOT EXISTS (SELECT id FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=django_ctype AND "State_id"= stateid AND "StateActive"=1) THEN
+	result := -1002;
+	scid := -1;
+	RETURN;
+END IF;
+SELECT id INTO state_content_type FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=django_ctype AND "State_id"= stateid AND "StateActive"=1;
+
+
+EXECUTE 'SELECT "SCI_id"  FROM "' || tablename || '" WHERE "id"=$1' INTO scid USING recid;
+IF scid IS NULL THEN
+	result := -1003;
+	scid := -1;
+	RETURN;
+END IF;
+IF scid=state_content_type THEN 
+	result := 1000;
+	RETURN;
+ELSE
+	result := -1004;
+	RETURN;
+END IF;
+
+END;
+$$ LANGUAGE plpgsql;

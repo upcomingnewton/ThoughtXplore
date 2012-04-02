@@ -1,0 +1,69 @@
+CREATE OR REPLACE FUNCTION  CheckUserForPermission(
+by_user VARCHAR,
+applabel VARCHAR,
+modelreq VARCHAR,
+operation_requested VARCHAR,
+OUT userid INTEGER,
+OUT varpci INTEGER,
+OUT varsci INTEGER,
+OUT status INTEGER
+) RETURNS RECORD AS $$
+DECLARE
+	usergroup_sci INTEGER;
+	var_per INTEGER;
+	var_ct INTEGER;
+	var_pcindex INTEGER;
+	usergroup_grp INTEGER;
+	var_sci INTEGER;
+BEGIN 
+-- 1. check if the requested operation is permitted
+
+SELECT id INTO var_per FROM "txMisc_miscpermission" WHERE "PermissionName"=operation_requested;
+SELECT id INTO var_ct FROM django_content_type WHERE app_label=applabel AND model=modelreq; 
+IF NOT EXISTS (SELECT id FROM "txMisc_permissioncontenttype" WHERE "Permission_id"=var_per AND "PermissionContentType_id"=var_ct AND "PermissionActive"=1) 	THEN
+		RAISE NOTICE 'This operation is not supported by system';
+		userid := -1;
+		varpci := -1;
+		varsci := -1;
+		status := -500;
+		RETURN;
+END IF;
+SELECT id INTO var_pcindex FROM "txMisc_permissioncontenttype" WHERE "Permission_id"=var_per AND "PermissionContentType_id"=var_ct AND "PermissionActive"=1;
+
+
+
+-- 2. check if the user can operation this operation
+
+SELECT id INTO usergroup_sci FROM "txMisc_statecontenttype" 
+	WHERE "StateContentType_id"=(SELECT id FROM django_content_type WHERE app_label='txUser' AND model='usergroup') 
+	AND "State_id"=( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE') 
+	AND "StateActive"=1;
+	
+IF NOT EXISTS (SELECT id FROM "txUser_user" WHERE "UserEmail"=by_user) THEN 
+		RAISE NOTICE 'USER DOES NOT EXISTS';
+		userid := -1;
+		varpci := -1;
+		varsci := -1;
+		status := -501;
+		RETURN;
+END IF;
+SELECT id INTO userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+SELECT "Group_id" INTO usergroup_grp FROM "txUser_usergroup"
+	WHERE "SCI_id"=usergroup_sci 
+	AND "User_id"=userid;
+	
+IF NOT EXISTS ( SELECT id FROM "txUser_grouppci" WHERE "Group_id"=usergroup_grp AND "PCI_id"=var_pcindex AND "Active"=1) THEN 
+		RAISE NOTICE 'This operation is not supported by system for this user';
+		userid := -1;
+		varpci := -1;
+		varsci := -1;
+		status := -502;
+		RETURN;
+ELSE
+		SELECT "ResultingSCI_id" INTO varsci FROM "txUser_grouppci" WHERE "Group_id"=usergroup_grp AND "PCI_id"=var_pcindex AND "Active"=1;
+		SELECT id INTO varpci FROM "txUser_grouppci" WHERE "Group_id"=usergroup_grp AND "PCI_id"=var_pcindex AND "Active"=1;
+		status := 500;
+		RETURN;
+END IF;
+END;
+$$ LANGUAGE plpgsql;

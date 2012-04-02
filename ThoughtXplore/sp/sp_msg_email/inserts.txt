@@ -1,0 +1,10 @@
+CREATE OR REPLACE FUNCTION email_db_entry(FromUserEmail text, FromUserid text, FromUserGroup text, Subject text, Message text,timestamp_ text, Attachment text,ToGroupIDs text, ToUserIDs text ) RETURNS VOID AS $$
+  
+DECLARE
+  id INTEGER;  
+BEGIN 
+
+ INSERT INTO "txEmails_sent_messages" values (id,FromUserEmail,FromUserid, FromUserGroup, Subject,Message,timestamp_,Attachment,ToGroupIDs, ToUserIDs ); 
+
+END;
+$$ LANGUAGE plpgsql;

@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>{{ title }}</title>
+</head>
+<body>
+<p>Folder List</p>
+<hr>
+{% for item in Folders %}
+<p>{{ item.name}}</p>
+{% endfor %}
+
+<form action="/folders/create/status/" method="POST">
+<hr>
+<p>User Name:
+<select name="cuser" id="id_cuser" title="User Name">
+	{% for item in Users %}
+	<option value={{item.id}}>{{item.UserFirstName}}</option>
+	{% endfor %}
+</select></p>    
+
+<p><label for="id_Folder_Name">Folder Name:</label>
+    <input type="text" name="Folder_Name" id="id_Folder_Name" /></p>
+<p><label for="id_Folder_Desc">Folder Description:</label>
+    <input type="text" name="Folder_Desc" id="id_Folder_Desc" /></p>
+
+<p>Folder Type:
+<select name="Folder_Type" id="id_Folder_Type" title="User Name">
+	{% for item in FolderType %}
+	<option value={{item.id}}>{{item.type_desc}}</option>
+	{% endfor %}
+</select></p>    
+
+<input type="submit" value="Submit" />
+</form>
+</body>
+
+</html>
