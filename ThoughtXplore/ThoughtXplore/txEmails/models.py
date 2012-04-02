@@ -1,6 +1,6 @@
 from django.db import models
 from ThoughtXplore.txUser.models import User, UserGroup 
-from ThoughtXplore.txMessaging.txEmails.DatabaseFunctions import DBInsertmail
+from ThoughtXplore.txEmails.DatabaseFunctions import DBInsertmail 
 '''
 
 A database class for storing the email logs

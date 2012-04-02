@@ -1,4 +1,4 @@
-from ThoughtXplore.txMessaging.txEmails.models import sent_messages 
+from ThoughtXplore.txEmails.models import sent_messages 
 from django.core.mail import send_mass_mail
 from ThoughtXplore.txUser.models import User, UserGroup
 from django.shortcuts import render_to_response
