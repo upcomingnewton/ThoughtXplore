@@ -1,10 +1,31 @@
-CREATE OR REPLACE FUNCTION email_db_entry(FromUserEmail text, FromUserid text, FromUserGroup text, Subject text, Message text,timestamp_ text, Attachment text,ToGroupIDs text, ToUserIDs text ) RETURNS VOID AS $$
+
   
-DECLARE
-  id INTEGER;  
+CREATE OR REPLACE FUNCTION email_db_entry(FromUserID INTEGER, FromUserEmail_ text, EmailTypeID INTEGER, TemplateID INTEGER, Subject_ text, ParameterDict_ text, Timestamp_ text, ToGroupIDs_ text, ToUserIDs_ text, ToUserEmails_ text ) RETURNS VOID AS $$
+
 BEGIN 
 
- INSERT INTO "txEmails_sent_messages" values (id,FromUserEmail,FromUserid, FromUserGroup, Subject,Message,timestamp_,Attachment,ToGroupIDs, ToUserIDs ); 
+ INSERT INTO "txEmails_emails"("FromUserID_id", "FromUserEmail","EmailTypeID_id","TemplateID_id","Subject","ParameterDict","DateTimeSent","ToGroupIDs", "ToUserIDs", "ToUserEmails") values (FromUserID, FromUserEmail_,EmailTypeID,TemplateID, Subject_,ParameterDict_,Timestamp_,ToGroupIDs_, ToUserIDs_, ToUserEmails_ ); 
 
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insertemailtemplate(EmailType INTEGER, TemplateName text, TemplateFormat text,paramList text, Author INTEGER ) RETURNS VOID AS $$
+
+
+BEGIN 
+ 
+ INSERT INTO "txEmails_emailtemplate"("EmailType_id","TemplateName","TemplateFormat","paramList","Author_id") values (EmailType, TemplateName,TemplateFormat,paramList,Author ); 
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION insertemailtype(typeName_ text, url_ text, addninfo_ text) RETURNS VOID AS $$
+
+BEGIN
+	INSERT INTO "txEmails_emailmessagetypes"("TypeName", "url", "addninfo") values (typeName_, url_, addninfo_);
+END;
+$$ LANGUAGE plpgsql;
+
+
+
