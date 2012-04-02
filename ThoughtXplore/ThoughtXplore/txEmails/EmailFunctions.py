@@ -24,5 +24,6 @@ class EmailFunx(Emails, EmailMessageTypes,EmailTemplate):
                        'ToGroupIDs':togroupIDs,
                        'ToUserIDs':touserIDs,
                        'ToUserEmails':ToUserEmails
-                               }     
+                               } 
+        print sent_message    
         return DBInsertmail(sent_message)

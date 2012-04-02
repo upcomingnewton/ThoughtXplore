@@ -84,7 +84,8 @@ def Indexaddtemplate(request):
 def send_mails(param):
     
   
-    
+    print "here"
+    print param
     to_id_list=[]
     for a in param['togroupIDs']:
             for b in UserGroup.objects.filter(Group=a):
@@ -120,7 +121,7 @@ def send_mails(param):
     encdec=Encrypt()
     for i in to_email_list:
         token=encdec.encrypt(i)
-        token="http://127.0.0.1:8000/user/authenticate/email"+token+"/"
+        token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/"
     param_list_.append(str(token))
     print token
     print param_list_
@@ -155,16 +156,10 @@ def send_mails(param):
         to_id_list_="Null"
     else:
         to_group_list="Null"
-    
-    
-
-    
-    
-    
-    
+    print "till here"
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
     emailfunc= EmailFunx()
-    emailfunc.mailInsertDB(param['fromUserID'],from_,  param['EmailTypeID'],param['TemplateID'], param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_)
+    emailfunc.mailInsertDB(str(param['fromUserID']),from_,  str(param['EmailTypeID']),str(param['TemplateID']), param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_)
     
      
         
