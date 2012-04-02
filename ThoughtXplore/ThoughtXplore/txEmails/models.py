@@ -1,7 +1,6 @@
 from django.db import models
-from ThoughtXplore.txUser.models import User, UserGroup 
+from ThoughtXplore.txUser.models import User 
 from ThoughtXplore.txMisc.models import PermissionContentType
-from ThoughtXplore.txEmails.DatabaseFunctions import DBInsertEmailTemplate, DBInsertmail
     
 class EmailMessageTypes(models.Model):
     
@@ -36,6 +35,7 @@ class Emails(models.Model):
     
 
 class EmailLogs(models.Model):
+    
     # user making changes
     LogsUser = models.ForeignKey(User)
     # row id being changed

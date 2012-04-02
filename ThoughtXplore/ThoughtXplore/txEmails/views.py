@@ -1,9 +1,10 @@
-from ThoughtXplore.txEmails.models import Emails, EmailMessageTypes, EmailTemplate
-from django.core.mail import send_mass_mail, send_mail
+from ThoughtXplore.txEmails.models import EmailMessageTypes, EmailTemplate
+from django.core.mail import send_mail
 from ThoughtXplore.txUser.models import User, UserGroup
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from ThoughtXplore.txMisc.enc_dec import Encrypt
 import re
 from cPickle import dumps, loads
 import string
@@ -110,10 +111,21 @@ def send_mails(param):
     
     reqparam_=string.split(reqparam,',')
     
-    
         
     Template=str(Template)
 
+    print "token"
+    print to_email_list
+    
+    encdec=Encrypt()
+    for i in to_email_list:
+        token=encdec.encrypt(i)
+        token="http://127.0.0.1:8000/user/authenticate/email"+token+"/"
+    param_list_.append(str(token))
+    print token
+    print param_list_
+    print "lol"
+    print reqparam_
     for i,v in zip(reqparam_,param_list_):    
         Template=Template.replace(i, v)
     message=Template
@@ -143,7 +155,13 @@ def send_mails(param):
         to_id_list_="Null"
     else:
         to_group_list="Null"
-        
+    
+    
+
+    
+    
+    
+    
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
     emailfunc= EmailFunx()
     emailfunc.mailInsertDB(param['fromUserID'],from_,  param['EmailTypeID'],param['TemplateID'], param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_)
