@@ -7,7 +7,7 @@ from django.http import HttpResponse
 import re
 from cPickle import dumps, loads
 import string
-
+from ThoughtXplore.txEmails.EmailFunctions import EmailFunx
 pattern = re.compile(r'\s*("[^"]*"|.*?)\s*,')
 def split(line):
     return [x[1:-1] if x[:1] == x[-1:] == '"' else x
@@ -24,9 +24,9 @@ def addtemplate(HttpRequest):
     paramList_=  dumps(paramList).encode("zip").encode("base64").strip()
     TemplateFormat_=dumps(TemplateFormat).encode("zip").encode("base64").strip()
     template= EmailTemplate()
-     
+    emailfunc= EmailFunx()
     
-    template.dbInsertEmailTemplates(EmailType, TemplateName, TemplateFormat_, paramList_, authorID)
+    emailfunc.DBInsertEmailTemplates(EmailType, TemplateName, TemplateFormat_, paramList_, authorID)
 
 @csrf_exempt
 def sendmail(HttpRequest):
@@ -145,8 +145,8 @@ def send_mails(param):
         to_group_list="Null"
         
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
-    message= Emails()
-    message.mailInsertdb( param['fromUserID'],from_,  param['EmailTypeID'],param['TemplateID'], param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_)
+    emailfunc= EmailFunx()
+    emailfunc.DBmailInsert(param['fromUserID'],from_,  param['EmailTypeID'],param['TemplateID'], param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_)
     
      
         
