@@ -1,0 +1,58 @@
+/*
+
+Task:
+
+1) Making entries in state content type and permission content type
+2) Insert in EmailTypes..
+
+*/
+CREATE OR REPLACE FUNCTION initilaize_txEmails() RETURNS VOID AS $$
+ 
+DECLARE
+ template_row_index INTEGER;
+ emailtype_row_index INTEGER;
+ email_row_index INTEGER;
+ 
+ 
+ var_state_active INTEGER;
+ var_txEMAILS_TEMPLATE_CREATE INTEGER;
+ var_txEMAILS_EMAILTYPE_CREATE INTEGER;
+ var_txEMAILS_TEMPLATE_DELETE INTEGER;
+ var_txEMAILS_EMAILTYPE_DELETE INTEGER;
+ var_txEMAILS_EMAILS_SEND INTEGER;
+ 
+ result INTEGER;
+BEGIN
+  RAISE NOTICE '=== initializing emails ===';
+
+
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txEMAILS_TEMPLATE_CREATE','Create Email Template');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txEMAILS_TEMPLATE_DELETE','Delete Email Template');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txEMAILS_EMAILS_SEND','Send Email');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txEMAILS_EMAILTYPE_CREATE','Create Email Type');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txEMAILS_EMAILTYPE_DELETE','Delete Email Type');
+
+ /*Adding to StateContentType*/
+
+ 
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emailtemplate' ) ,1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emailmessagetypes'),1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emails'),1);
+ 
+ /*
+ 	Adding Permissions: 
+  */
+   
+ 
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_TEMPLATE_CREATE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emailtemplate' ), ( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_EMAILTYPE_CREATE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emailtemplate'),( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_TEMPLATE_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emailtemplate'), (SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_EMAILTYPE_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emailmessagetypes'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((  SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_EMAILS_SEND'),(SELECT id FROM django_content_type WHERE app_label='txEmails' AND model='emails'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+
+ /*END ADDING PERMISSIONS */
+ 
+ PERFORM insertemailtype('Resgistration', '/email/user/register/register','From InsertUserFromSite, to send Email Authenticate email');
+ 
+END;
+$$ LANGUAGE plpgsql;

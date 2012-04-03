@@ -1,13 +1,12 @@
 from django.db import models
 from ThoughtXplore.txUser.models import User 
-from ThoughtXplore.txMisc.models import PermissionContentType
+from ThoughtXplore.txMisc.models import PermissionContentType, StateContentType
     
 class EmailMessageTypes(models.Model):
     
     TypeName = models.CharField(max_length=100)
     url =models.CharField(max_length=200)
     addninfo = models.CharField(max_length=100)
-    
         
 class EmailTemplate(models.Model):
     
@@ -17,7 +16,6 @@ class EmailTemplate(models.Model):
     paramList=models.TextField()
     Author=models.ForeignKey(User)
     
-
 
 class Emails(models.Model):
 
@@ -32,8 +30,6 @@ class Emails(models.Model):
     ToUserIDs=models.TextField()
     ToUserEmails= models.TextField()
     
-    
-
 class EmailLogs(models.Model):
     
     # user making changes

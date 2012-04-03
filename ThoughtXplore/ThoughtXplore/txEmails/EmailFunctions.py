@@ -3,16 +3,17 @@ from ThoughtXplore.txEmails.DatabaseFunctions import DBInsertmail, DBInsertEmail
 class EmailFunx(Emails, EmailMessageTypes,EmailTemplate):
     
 
-    def dbInsertEmailTemplates(self,EmailType, TemplateName, TemplateFormat, paramList, Author):
+    def dbInsertEmailTemplates(self,EmailType, TemplateName, TemplateFormat, paramList, Author, ip):
         emailtemplate={
                    'EmailType': EmailType,
                    'TemplateName': TemplateName,
                    'TemplateFormat':TemplateFormat,
                    'paramList':paramList,
-                   'Author':Author                   
+                   'Author':Author,    
+                   'ip':ip               
                    }
         return DBInsertEmailTemplate(emailtemplate)
-    def mailInsertDB(self,FromUserID, fromuseremail, EmailTypeID,TemplateID,Subject,ParameterDict, togroupIDs, touserIDs, ToUserEmails): 
+    def mailInsertDB(self,FromUserID, fromuseremail, EmailTypeID,TemplateID,Subject,ParameterDict, togroupIDs, touserIDs, ToUserEmails, ip): 
         print "here1"
         sent_message={
                        'FromUserID': FromUserID,
@@ -23,7 +24,8 @@ class EmailFunx(Emails, EmailMessageTypes,EmailTemplate):
                        'ParameterDict': ParameterDict,
                        'ToGroupIDs':togroupIDs,
                        'ToUserIDs':touserIDs,
-                       'ToUserEmails':ToUserEmails
+                       'ToUserEmails':ToUserEmails,
+                       'ip':ip
                                } 
         print sent_message    
         return DBInsertmail(sent_message)

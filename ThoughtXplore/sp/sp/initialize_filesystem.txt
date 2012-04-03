@@ -12,7 +12,6 @@ DECLARE
  file_row_index INTEGER;
  folder_row_index INTEGER;
  var_state_active INTEGER;
- id INTEGER;
  var_per_LIST_ONLY INTEGER;
  var_per_LIST_ACCESS INTEGER;
  var_per_CREATE_ACCESS_DELETE INTEGER;
@@ -22,13 +21,13 @@ DECLARE
 BEGIN
   RAISE NOTICE '=== initializing filesystem ===';
 
-/*
+
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('LIST_ONLY','List Files only');
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('LIST_ACCESS','List and Access Only');
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('CREATE_ACCESS_DELETE','Create, Access & Delete');
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('READ_ONLY','Read File only');
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('READ_WRITE','Read and Write');
-*/
+
  SELECT INTO var_per_LIST_ONLY id FROM "txMisc_miscpermission" WHERE "PermissionName"='LIST_ONLY';
  IF NOT FOUND THEN
     RAISE EXCEPTION 'id % not found', LIST_ONLY;
@@ -91,12 +90,14 @@ BEGIN
  	FILES=
  		"Read-only", "Read-Write"
   */
+  
+
  
- INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(7, 30, 1);
- INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(8, 30, 1);
- INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(9, 30, 1);
- INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(10, 31, 1);
- INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(11, 31, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_LIST_ONLY, folder_row_index, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_LIST_ACCESS, folder_row_index, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_CREATE_ACCESS_DELETE, folder_row_index, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_READ_ONLY, file_row_index, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_READ_WRITE, file_row_index, 1);
     
  /*END ADDING PERMISSIONS */
  

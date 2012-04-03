@@ -1,4 +1,10 @@
 
+
+
+  
+  
+  
+  
   
 CREATE OR REPLACE FUNCTION email_db_entry(FromUserID INTEGER, FromUserEmail_ text, EmailTypeID INTEGER, TemplateID INTEGER, Subject_ text, ParameterDict_ text, Timestamp_ text, ToGroupIDs_ text, ToUserIDs_ text, ToUserEmails_ text ) RETURNS VOID AS $$
 
@@ -9,23 +15,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insertemailtemplate(EmailType INTEGER, TemplateName text, TemplateFormat text,paramList text, Author INTEGER ) RETURNS VOID AS $$
 
 
-BEGIN 
- 
- INSERT INTO "txEmails_emailtemplate"("EmailType_id","TemplateName","TemplateFormat","paramList","Author_id") values (EmailType, TemplateName,TemplateFormat,paramList,Author ); 
 
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION insertemailtype(typeName_ text, url_ text, addninfo_ text) RETURNS VOID AS $$
-
-BEGIN
-	INSERT INTO "txEmails_emailmessagetypes"("TypeName", "url", "addninfo") values (typeName_, url_, addninfo_);
-END;
-$$ LANGUAGE plpgsql;
 
 
 

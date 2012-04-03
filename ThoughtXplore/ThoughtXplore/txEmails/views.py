@@ -26,8 +26,8 @@ def addtemplate(HttpRequest):
     TemplateFormat_=dumps(TemplateFormat).encode("zip").encode("base64").strip()
     template= EmailTemplate()
     emailfunc= EmailFunx()
-    
-    emailfunc.dbInsertEmailTemplates(EmailType, TemplateName, TemplateFormat_, paramList_, authorID)
+    ip=HttpRequest.META['REMOTE_ADDR']
+    emailfunc.dbInsertEmailTemplates(EmailType, TemplateName, TemplateFormat_, paramList_, authorID, ip)
 
 @csrf_exempt
 def sendmail(HttpRequest):
@@ -59,7 +59,8 @@ def sendmail(HttpRequest):
            'paramList':paramList,
            'togroupIDs':togroupIDs,
            'touserIDs':touserIDs,
-           'EmailTypeID':EmailTypeID
+           'EmailTypeID':EmailTypeID,
+           'ip':HttpRequest.META['REMOTE_ADDR']
             }
     print "lol"
     print param
@@ -160,7 +161,7 @@ def send_mails(param):
     print "till here"
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
     emailfunc= EmailFunx()
-    emailfunc.mailInsertDB(str(param['fromUserID']),from_,  str(param['EmailTypeID']),str(param['TemplateID']), param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_)
+    emailfunc.mailInsertDB(str(param['fromUserID']),from_,  str(param['EmailTypeID']),str(param['TemplateID']), param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_, param['ip'])
     
      
         

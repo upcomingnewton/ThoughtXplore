@@ -1,0 +1,67 @@
+	CREATE OR REPLACE FUNCTION two_initilaize_per_txEmails() RETURNS VOID AS $$
+	DECLARE
+	 var_per INTEGER;
+	 var_ct INTEGER;
+	 var_pci RECORD;
+	 var_state_active INTEGER;
+	 var_state_delete INTEGER;
+	 
+	 var_per_insert INTEGER;
+	 var_per_delete INTEGER;
+	 var_per_update INTEGER;
+	 var_per_txEMAILS_TEMPLATE_CREATE INTEGER;
+	 var_per_txEMAILS_EMAILTYPE_CREATE INTEGER;
+	 var_per_txEMAILS_TEMPLATE_DELETE INTEGER;
+	 var_per_txEMAILS_EMAILTYPE_DELETE INTEGER;
+	 var_per_txEMAILS_EMAILS_SEND INTEGER;
+	 
+	 
+	 
+	 
+	 group_index INTEGER;
+	 var_user INTEGER;
+	 BEGIN
+	 SELECT id INTO var_state_active FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE';  
+	 SELECT id INTO var_state_delete FROM "txMisc_miscstate" WHERE "StateName"='DELETED'; 
+	 SELECT id INTO group_index FROM "txUser_group" WHERE "GroupName"='superusers';
+	 RAISE NOTICE 'STATE TABLE : active = %, deleted = %',var_state_active,var_state_delete;
+	 
+	 SELECT id INTO var_per_txEMAILS_TEMPLATE_CREATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_TEMPLATE_CREATE';
+	 SELECT id INTO var_per_txEMAILS_EMAILTYPE_CREATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_EMAILTYPE_CREATE';
+	 SELECT id INTO var_per_txEMAILS_TEMPLATE_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_TEMPLATE_DELETE';
+	 SELECT id INTO var_per_txEMAILS_EMAILTYPE_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_EMAILTYPE_DELETE';
+	 SELECT id INTO var_per_txEMAILS_EMAILS_SEND FROM "txMisc_miscpermission" WHERE "PermissionName"='txEMAILS_EMAILS_SEND';
+	 
+	 RAISE NOTICE 'PERMISSION TABLE : insert = %, update = %, delete=%',var_per_insert,var_per_update,var_per_delete;
+	  <<grouppci>>
+	  FOR var_pci IN SELECT * FROM "txMisc_permissioncontenttype" LOOP
+	    var_ct := var_pci."PermissionContentType_id";
+	    var_per := var_pci."Permission_id";
+	    IF (var_per = var_per_txEMAILS_TEMPLATE_CREATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txEMAILS_EMAILTYPE_CREATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txEMAILS_TEMPLATE_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    
+	    IF (var_per = var_per_txEMAILS_EMAILTYPE_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txEMAILS_EMAILS_SEND) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	  	RAISE NOTICE 'permission id : %, content_type : %',var_per,var_ct;
+	  END LOOP grouppci;
+	  
+	  
+	  
+	 END;
+	$$ LANGUAGE plpgsql;
