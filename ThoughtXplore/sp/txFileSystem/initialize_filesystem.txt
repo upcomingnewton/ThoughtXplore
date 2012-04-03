@@ -6,18 +6,26 @@ Task:
 2) Insert in file_types and folder_types..
 
 */
-CREATE OR REPLACE FUNCTION initilaize_FS() RETURNS VOID AS $$
+
+//two_initialize_fs_perm is pending
+
+
+CREATE OR REPLACE FUNCTION one_initilaize_FS() RETURNS VOID AS $$
  
 DECLARE
  file_row_index INTEGER;
  folder_row_index INTEGER;
+ filetype_row_index INTEGER;
+ foldertype_row_index INTEGER;
  var_state_active INTEGER;
+ var_per_INSERT INTEGER;
  var_per_LIST_ONLY INTEGER;
  var_per_LIST_ACCESS INTEGER;
  var_per_CREATE_ACCESS_DELETE INTEGER;
  var_per_READ_ONLY INTEGER;
  var_per_READ_WRITE INTEGER;
  result INTEGER;
+ createdaemon_id INTEGER;
 BEGIN
   RAISE NOTICE '=== initializing filesystem ===';
 
@@ -48,7 +56,10 @@ BEGIN
  IF NOT FOUND THEN
     RAISE EXCEPTION 'id % not found', READ_WRITE;
  END IF;
- 
+ SELECT INTO var_perINSERT id FROM "txMisc_miscpermission" WHERE "PermissionName"='INSERT';
+ IF NOT FOUND THEN
+    RAISE EXCEPTION 'id % not found', LIST_ONLY;
+ END IF;
  RAISE NOTICE 'PERMISSION TABLE : LIST_ONLY = %, LIST_ACCESS = %, CREATE_ACCESS_DELETE=%, READ_ONLY = %, READ_WRITE=%',var_per_LIST_ONLY,var_per_LIST_ACCESS,var_per_CREATE_ACCESS_DELETE,var_per_READ_ONLY, var_per_READ_WRITE;
  SELECT COUNT(id) INTO result FROM "txMisc_miscpermission";
  RAISE NOTICE '[USER TRACE] ROW COUNT OF txMisc_miscpermission is % ',result;
@@ -62,6 +73,17 @@ BEGIN
  IF NOT FOUND THEN
     RAISE EXCEPTION 'id % not found', folder_basics;
  END IF;
+ 
+  SELECT INTO filetype_row_index id FROM django_content_type WHERE app_label='txFileSystem' AND model='filetypes';
+ IF NOT FOUND THEN
+    RAISE EXCEPTION 'id % not found', files_basics;
+ END IF;
+ 
+ SELECT INTO foldertype_row_index id FROM django_content_type WHERE app_label='txFileSystem' AND model='foldertypes';
+ IF NOT FOUND THEN
+    RAISE EXCEPTION 'id % not found', folder_basics;
+ END IF;
+ 
  
  SELECT INTO var_state_active id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE';
  IF NOT FOUND THEN
@@ -82,6 +104,8 @@ BEGIN
  
  INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,folder_row_index,1);
  INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,file_row_index,1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,foldertype_row_index,1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,filetype_row_index,1);
  
  /*
  	Adding Permissions: 
@@ -98,20 +122,23 @@ BEGIN
  INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_CREATE_ACCESS_DELETE, folder_row_index, 1);
  INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_READ_ONLY, file_row_index, 1);
  INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_READ_WRITE, file_row_index, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_INSERT, filetype_row_index, 1);
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES(var_per_INSERT, foldertype_row_index, 1);
+ 
     
  /*END ADDING PERMISSIONS */
- 
- PERFORM insert_foldertype('Profile_Pics', 'Profile_Pics');
- PERFORM insert_foldertype('Resumes', 'Resumes');
- PERFORM insert_foldertype('Learning_Resources', 'Learning Resources');
- PERFORM insert_filetype('image/jpg', 'JPEG Image');
- PERFORM insert_filetype('image/png', 'PNG Image');
- PERFORM insert_filetype('music/wav', 'WAV Sound File');
- PERFORM insert_filetype('music/mp3', 'MP3 Sound File');
- PERFORM insert_filetype('video/mp4', 'MP4 Video File');
- PERFORM insert_filetype('video/flv', 'FLV Video File');
- PERFORM insert_filetype('doc/pdf', 'PDF Document');
- PERFORM insert_filetype('doc', 'Document');
+ SELECT id into createdaemon_id FROM txUser_user WHERE "UserFirstName"='CreateUserDeamon'
+ PERFORM insert_foldertype('Profile_Pics', 'Profile_Pics',createdaemon_id);
+ PERFORM insert_foldertype('Resumes', 'Resumes',createdaemon_id);
+ PERFORM insert_foldertype('Learning_Resources', 'Learning Resources',createdaemon_id);
+ PERFORM insert_filetype('image/jpg', 'JPEG Image',createdaemon_id);
+ PERFORM insert_filetype('image/png', 'PNG Image',createdaemon_id);
+ PERFORM insert_filetype('music/wav', 'WAV Sound File',createdaemon_id);
+ PERFORM insert_filetype('music/mp3', 'MP3 Sound File',createdaemon_id);
+ PERFORM insert_filetype('video/mp4', 'MP4 Video File',createdaemon_id);
+ PERFORM insert_filetype('video/flv', 'FLV Video File',createdaemon_id);
+ PERFORM insert_filetype('doc/pdf', 'PDF Document',createdaemon_id);
+ PERFORM insert_filetype('doc', 'Document',createdaemon_id);
   
 END;
 $$ LANGUAGE plpgsql;
