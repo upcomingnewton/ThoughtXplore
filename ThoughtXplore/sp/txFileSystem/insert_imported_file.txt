@@ -1,0 +1,72 @@
+
+CREATE OR REPLACE FUNCTION txFileSystem_files_basics(name_ text, desc_ text, url_ text, folder_id_ INTEGER, size_ INTEGER, file_type_id_ INTEGER,user_created_id_ INTEGER,
+OUT result_index INTEGER,ip VARCHAR,
+OUT result_sci INTEGER ) RETURNS RECORD AS $$
+
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+    varrec1 RECORD;
+	by_user TEXT;
+	
+BEGIN 
+temp:=0;
+/*  1. check if file exists or not    IF exists rename by adding '_1' at the end  */
+IF EXISTS ( SELECT id FROM "txFileSystem_files_basics" WHERE "name"=name_) THEN
+	
+	name_:=name_+'_1';
+	
+END IF;
+
+/*  2. check if requesting user has right to insert this email-type at this state  */
+
+
+SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=user_created_id_;
+
+
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txFileSystem','files_basics','List and Access Only');
+IF varrec.status <> 500 THEN
+	result_sci := -600;
+	result_index := varrec.status;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+/*  3. INSERT DATA INTO EMAIL TEMPLATE table */
+
+ INSERT INTO "txFileSystem_files_basics" values("name", "desc", "url", "folder_id", "size","filetype_id", "user_created_id", "ACTIVE") (name_, desc_, url_,folder_id_,size_, file_type_id_, user_created_id_, 1); 
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -600;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+END IF;
+SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+--RAISE NOTICE 'INSERT USER, id IS %',in_userid;
+
+
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txEmails_emaillogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -602;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	result_sci := varrec.varsci;
+	result_index := 601;
+	--COMMIT;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+

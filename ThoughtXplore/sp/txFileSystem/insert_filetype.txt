@@ -1,0 +1,72 @@
+
+
+CREATE OR REPLACE FUNCTION insert_filetype(type_name text, type_desc_ text, cuser
+OUT result_index INTEGER,ip VARCHAR,
+OUT result_sci INTEGER ) RETURNS RECORD AS $$
+
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+    varrec1 RECORD;
+	by_user TEXT;
+	
+BEGIN 
+temp:=0;
+/*  1. check if filetype exists or not    IF exists rs=602  */
+IF EXISTS ( SELECT id FROM "txFileSystem_filetypes" WHERE "typeName"=type_name) THEN
+	result_index := 602;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+/*  2. check if requesting user has right to insert this file-type at this state  */
+
+
+SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=cuser;
+
+
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txFileSystem','filetypes','INSERT');
+IF varrec.status <> 500 THEN
+	result_sci := -600;
+	result_index := varrec.status;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+/*  3. INSERT DATA INTO FileType table */
+
+ INSERT INTO "txFileSystem_filetypes"("typeName", "type_desc") values(type_name, type_desc_); 
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -600;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+END IF;
+SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+--RAISE NOTICE 'INSERT USER, id IS %',in_userid;
+
+
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txEmails_emaillogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -602;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	result_sci := varrec.varsci;
+	result_index := 601;
+	--COMMIT;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
