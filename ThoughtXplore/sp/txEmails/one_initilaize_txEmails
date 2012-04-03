@@ -6,7 +6,7 @@ Task:
 2) Insert in EmailTypes..
 
 */
-CREATE OR REPLACE FUNCTION initilaize_txEmails() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION one_initilaize_txEmails() RETURNS VOID AS $$
  
 DECLARE
  template_row_index INTEGER;
