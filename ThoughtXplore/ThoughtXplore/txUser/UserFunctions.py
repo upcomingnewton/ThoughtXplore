@@ -13,6 +13,8 @@ class UserFnx(User):
     def AuthenticateUserFromSite(self,emailid,ip):
 
         # 1. call authentication db script
+        print"here"
+        print emailid
         res = DBAuthenicateUser({'to_email':emailid,'by_email':'AuthenticateUserDaemon@tx.com','ip':ip,'type':'USER_AU'})
         
         return res
@@ -32,27 +34,32 @@ class UserFnx(User):
                 'entity':entity,
                 'by_email':'CreateUserDeamon@tx.com',
                 'ip':ip}
-        users_= User.objects.filter(UserEmail="sarvpriye98@gmail.com")
-        temp=EmailTemplate.objects.filter(TemplateName="R")
+        
+        print "clear0"
+        result = DBInsertUser(user)
+        print "clear1"
+        users_= User.objects.filter(UserEmail=email)
+        user_admin=User.objects.filter(UserEmail="sarvpriye98@gmail.com")
+        temp=EmailTemplate.objects.filter(TemplateName="Register")
         emailtype=EmailMessageTypes.objects.filter(TypeName="Registration")
         for i in temp:
             temp_id=i.id
         for i in users_:
             user_id= i.id
+        for i in user_admin:
+            user_id_admin= i.id
         for i in emailtype:
-            emailtype_id=i.id    
-        print "clear0"
-        result = DBInsertUser(user)
-        print "clear1"
+            emailtype_id=i.id
+            
         if ( result[0][0] == 601 ):
             
             param={
-                   'fromUserID':5,
+                   'fromUserID':user_id_admin,
                    'Subject':'Account Creation',
                    'TemplateID':temp_id,
-                   'paramList':email+",Sarv",
+                   'paramList':email,
                    'togroupIDs':[],
-                   'touserIDs':[5],
+                   'touserIDs':[user_id],
                    'EmailTypeID':emailtype_id
                    }
         print "lol"

@@ -18,5 +18,6 @@ def DBLoginUser(logindetails):
     
 def DBAuthenicateUser(auth_details):
     query = "SELECT * FROM txUser_user_authenicate('" + auth_details['to_email'] + "','" + auth_details['by_email'] + "','" + auth_details['ip'] + "','" + auth_details['type'] + "');"
+    print query
     result =  DBhelper.CallFunction(query)
     return result

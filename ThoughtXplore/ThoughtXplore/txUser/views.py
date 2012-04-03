@@ -6,6 +6,7 @@ from ThoughtXplore.txUser.models import User
 from ThoughtXplore.txUser.UserFunctions import UserFnx
 import datetime
 from ThoughtXplore.txUser.txEncDec import enc_dec
+from ThoughtXplore.txMisc.enc_dec import Encrypt
 
 def Index(request):
     #return HttpResponse("you are at the page for registering users")
@@ -41,7 +42,12 @@ def AuthenticateUserFromEmail(HttpRequest,token):
     au_user = UserFnx()
     try:
         print 'printing from view  '  + token
-        res = au_user.AuthenticateUserFromSite(token, HttpRequest.META['REMOTE_ADDR'])
+        e= Encrypt()
+        token1=e.decrypt(token)
+        
+        token1=str(token1)
+        print token1
+        res = au_user.AuthenticateUserFromSite(token1, HttpRequest.META['REMOTE_ADDR'])
         return HttpResponse("you are viewing status of user registeration "  + str(res))
     except:
         return HttpResponse("error")

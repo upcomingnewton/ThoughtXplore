@@ -132,9 +132,10 @@ def send_mails(param):
     message=Template
     
     datatuple=[param['Subject'], message,from_,to_email_list]
-    
+   
     #auth_user_="auth_user"
     #auth_password_="auth_password"
+    to_email_list.append("sarvpriye98@gmail.com")
     send_mail(param['Subject'], message,from_, to_email_list, fail_silently=True)
     #send_mass_mail(datatuple, fail_silently=True)    
     #db entry
