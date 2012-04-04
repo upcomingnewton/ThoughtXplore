@@ -34,7 +34,7 @@ IF varrec.status <> 500 THEN
 END IF;
 /*  3. INSERT DATA INTO EMAIL TEMPLATE table */
 
- INSERT INTO "txFileSystem_files_basics" values("name", "desc", "url", "folder_id", "size","filetype_id", "user_created_id", "ACTIVE") (name_, desc_, url_,folder_id_,size_, file_type_id_, user_created_id_, 1); 
+ INSERT INTO "txFileSystem_files_basics" values("name", "desc", "url", "folder_id", "size","file_type_id", "user_created_id", "ACTIVE") (name_, desc_, url_,folder_id_,size_, file_type_id_, user_created_id_, 1); 
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 

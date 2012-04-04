@@ -52,7 +52,7 @@ BEGIN
 
  /*END ADDING PERMISSIONS */
  
- PERFORM insertemailtype('Resgistration', '/email/user/register/register','From InsertUserFromSite, to send Email Authenticate email');
+ PERFORM insertemailtype('Registration', '/email/user/register/register','From InsertUserFromSite, to send Email Authenticate email');
  
 END;
 $$ LANGUAGE plpgsql;

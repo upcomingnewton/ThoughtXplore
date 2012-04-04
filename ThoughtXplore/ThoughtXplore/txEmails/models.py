@@ -1,6 +1,6 @@
 from django.db import models
 from ThoughtXplore.txUser.models import User 
-from ThoughtXplore.txMisc.models import PermissionContentType, StateContentType
+from ThoughtXplore.txMisc.models import PermissionContentType
     
 class EmailMessageTypes(models.Model):
     

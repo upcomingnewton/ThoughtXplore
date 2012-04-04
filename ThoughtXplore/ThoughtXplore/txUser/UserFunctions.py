@@ -17,6 +17,9 @@ class UserFnx(User):
         print emailid
         res = DBAuthenicateUser({'to_email':emailid,'by_email':'AuthenticateUserDaemon@tx.com','ip':ip,'type':'USER_AU'})
         
+        if ( res[0][0] == 695 ):
+            # call here user email system
+            print 'hi'
         return res
         
     def InsertUserFromSite(self,email,password,fname,mname,lname,gender,bday,entity,ip):
@@ -39,7 +42,7 @@ class UserFnx(User):
         result = DBInsertUser(user)
         print "clear1"
         users_= User.objects.filter(UserEmail=email)
-        user_admin=User.objects.filter(UserEmail="sarvpriye98@gmail.com")
+        user_admin=User.objects.filter(UserEmail="CreateUserDeamon@tx.com")
         temp=EmailTemplate.objects.filter(TemplateName="Register")
         emailtype=EmailMessageTypes.objects.filter(TypeName="Registration")
         for i in temp:
@@ -50,7 +53,12 @@ class UserFnx(User):
             user_id_admin= i.id
         for i in emailtype:
             emailtype_id=i.id
-            
+        print "here1"
+        print user_id_admin
+        print temp_id
+        print email
+        print user_id
+        print emailtype_id
         if ( result[0][0] == 601 ):
             
             param={
@@ -60,11 +68,14 @@ class UserFnx(User):
                    'paramList':email,
                    'togroupIDs':[],
                    'touserIDs':[user_id],
-                   'EmailTypeID':emailtype_id
+                   'EmailTypeID':emailtype_id,
+                    'ip':ip,
+                    'email_code_name':'Auth_Email'
+
                    }
         print "lol"
         print param
-        send_mails(param)
+        r= send_mails(param)
         print "done"
         
         return result

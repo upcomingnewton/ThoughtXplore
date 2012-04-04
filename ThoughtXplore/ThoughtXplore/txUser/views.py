@@ -48,6 +48,8 @@ def AuthenticateUserFromEmail(HttpRequest,token):
         token1=str(token1)
         print token1
         res = au_user.AuthenticateUserFromSite(token1, HttpRequest.META['REMOTE_ADDR'])
+        print "here11"
+        print str(res)
         return HttpResponse("you are viewing status of user registeration "  + str(res))
     except:
         return HttpResponse("error")

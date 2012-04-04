@@ -1,7 +1,7 @@
 
 
-CREATE OR REPLACE FUNCTION insert_filetype(type_name text, type_desc_ text, cuser
-OUT result_index INTEGER,ip VARCHAR,
+CREATE OR REPLACE FUNCTION insert_filetype(type_name text, type_desc_ text, cuser INTEGER,ip VARCHAR,
+OUT result_index INTEGER,
 OUT result_sci INTEGER ) RETURNS RECORD AS $$
 
 DECLARE 

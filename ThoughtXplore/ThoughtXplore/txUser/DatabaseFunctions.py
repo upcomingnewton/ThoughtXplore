@@ -9,6 +9,7 @@ def DBInsertUser(userdetails):
     query = "SELECT * FROM txUser_user_insert('" + userdetails['email'] + "','" + userdetails['pass'] + "','" + userdetails['fname'] + "','" + userdetails['mname'] + "','" + userdetails['lname'] + "','" + userdetails['gender'] + "','" + userdetails['bday'] + "','" + userdetails['entity'] + "','" + userdetails['by_email'] + "','" + userdetails['ip'] +"'); "
     print query
     result =  DBhelper.CallFunction(query)
+    print "here"
     print result
     return result
     

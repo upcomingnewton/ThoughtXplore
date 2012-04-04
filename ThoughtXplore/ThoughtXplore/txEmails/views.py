@@ -60,7 +60,8 @@ def sendmail(HttpRequest):
            'togroupIDs':togroupIDs,
            'touserIDs':touserIDs,
            'EmailTypeID':EmailTypeID,
-           'ip':HttpRequest.META['REMOTE_ADDR']
+           'ip':HttpRequest.META['REMOTE_ADDR'],
+           'email_code_name': 'General Template Email'
             }
     print "lol"
     print param
@@ -84,7 +85,7 @@ def Indexaddtemplate(request):
 @csrf_exempt
 def send_mails(param):
     
-  
+    email_code_name=param['email_code_name']
     print "here"
     print param
     to_id_list=[]
@@ -116,18 +117,12 @@ def send_mails(param):
         
     Template=str(Template)
 
-    print "token"
-    print to_email_list
-    
-    encdec=Encrypt()
-    for i in to_email_list:
-        token=encdec.encrypt(i)
-        token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/"
-    param_list_.append(str(token))
-    print token
-    print param_list_
-    print "lol"
-    print reqparam_
+    if(email_code_name=='Auth_Email'):
+        encdec=Encrypt()
+        for i in to_email_list:
+            token=encdec.encrypt(i)
+            token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/"
+        param_list_.append(str(token))
     for i,v in zip(reqparam_,param_list_):    
         Template=Template.replace(i, v)
     message=Template
@@ -162,6 +157,7 @@ def send_mails(param):
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
     emailfunc= EmailFunx()
     emailfunc.mailInsertDB(str(param['fromUserID']),from_,  str(param['EmailTypeID']),str(param['TemplateID']), param['Subject'],paramList,to_group_list, to_id_list_, to_email_list_, param['ip'])
-    
+    print "end of send_email"
+    return 1
      
         

@@ -1,6 +1,6 @@
 
 
-CREATE OR REPLACE FUNCTION insert_foldertype(type_name text, type_desc_ text, cuser
+CREATE OR REPLACE FUNCTION insert_foldertype(type_name text, type_desc_ text, cuser INTEGER,
 OUT result_index INTEGER,ip VARCHAR,
 OUT result_sci INTEGER ) RETURNS RECORD AS $$
 

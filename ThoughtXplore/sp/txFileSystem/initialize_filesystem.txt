@@ -7,7 +7,6 @@ Task:
 
 */
 
-//two_initialize_fs_perm is pending
 
 
 CREATE OR REPLACE FUNCTION one_initilaize_FS() RETURNS VOID AS $$
