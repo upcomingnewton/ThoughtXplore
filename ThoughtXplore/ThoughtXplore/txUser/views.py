@@ -5,7 +5,6 @@ from django.shortcuts import render_to_response
 from ThoughtXplore.txUser.models import User
 from ThoughtXplore.txUser.UserFunctions import UserFnx
 import datetime
-from ThoughtXplore.txUser.txEncDec import enc_dec
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 
 def Index(request):

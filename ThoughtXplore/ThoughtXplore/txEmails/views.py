@@ -28,7 +28,8 @@ def addtemplate(HttpRequest):
     emailfunc= EmailFunx()
     ip=HttpRequest.META['REMOTE_ADDR']
     emailfunc.dbInsertEmailTemplates(EmailType, TemplateName, TemplateFormat_, paramList_, authorID, ip)
-
+    print "done"
+    return HttpResponse("Done")
 @csrf_exempt
 def sendmail(HttpRequest):
     

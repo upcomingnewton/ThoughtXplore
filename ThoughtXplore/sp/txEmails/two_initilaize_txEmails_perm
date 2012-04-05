@@ -1,4 +1,4 @@
-	CREATE OR REPLACE FUNCTION one_initilaize_txEmails() RETURNS VOID AS $$
+	CREATE OR REPLACE FUNCTION two_initilaize_txEmails() RETURNS VOID AS $$
 	DECLARE
 	 var_per INTEGER;
 	 var_ct INTEGER;

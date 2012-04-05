@@ -55,7 +55,7 @@ BEGIN
  IF NOT FOUND THEN
     RAISE EXCEPTION 'id % not found', READ_WRITE;
  END IF;
- SELECT INTO var_perINSERT id FROM "txMisc_miscpermission" WHERE "PermissionName"='INSERT';
+ SELECT INTO var_per_INSERT id FROM "txMisc_miscpermission" WHERE "PermissionName"='INSERT';
  IF NOT FOUND THEN
     RAISE EXCEPTION 'id % not found', LIST_ONLY;
  END IF;
@@ -126,7 +126,7 @@ BEGIN
  
     
  /*END ADDING PERMISSIONS */
- SELECT id into createdaemon_id FROM txUser_user WHERE "UserFirstName"='CreateUserDeamon'
+ SELECT id into createdaemon_id FROM "txUser_user" WHERE "UserFirstName"='CreateUserDeamon';
  PERFORM insert_foldertype('Profile_Pics', 'Profile_Pics',createdaemon_id);
  PERFORM insert_foldertype('Resumes', 'Resumes',createdaemon_id);
  PERFORM insert_foldertype('Learning_Resources', 'Learning Resources',createdaemon_id);

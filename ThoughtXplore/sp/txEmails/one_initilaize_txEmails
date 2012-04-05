@@ -52,7 +52,6 @@ BEGIN
 
  /*END ADDING PERMISSIONS */
  
- PERFORM insertemailtype('Registration', '/email/user/register/register','From InsertUserFromSite, to send Email Authenticate email');
- 
+ INSERT INTO "txEmails_emailmessagetypes"("TypeName","url", "addninfo") values ('Registration', '/email/user/register/register','From InsertUserFromSite, to send Email Authenticate email');
 END;
 $$ LANGUAGE plpgsql;
