@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION CommunicationTypeInsert(Author text, type_ text, ip TEXT, OUT result_index INTEGER,
+CREATE OR REPLACE FUNCTION CommunicationTypeInsert(Author INTEGER, type_ text, ip TEXT, OUT result_index INTEGER,
 OUT result_sci INTEGER ) RETURNS RECORD AS $$
 
 DECLARE 
@@ -22,7 +22,7 @@ END IF;
 SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=Author;
 
 
-SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communication_type','txCommunication_commtype_CREATE');
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txCommunications','communication_type','txCommunication_commtype_CREATE');
 IF varrec.status <> 500 THEN
 	result_sci := -600;
 	result_index := varrec.status;
@@ -31,7 +31,7 @@ IF varrec.status <> 500 THEN
 END IF;
 /*  3. INSERT DATA INTO Communiication Type table */
 
-	INSERT INTO "txCommunications_communication_type"("type") values (type_);
+	INSERT INTO "txCommunications_communication_type"("type","SCI_id") values (type_,varrec.varsci);
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 

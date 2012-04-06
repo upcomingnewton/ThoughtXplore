@@ -63,7 +63,7 @@
 	    END IF;
 	    IF (var_per = var_per_txCommunication_comm_DELETE) THEN 
 	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
-	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_deleted AND "StateActive"=1),1);
 	    END IF;
 	    
 	    IF (var_per = var_per_txCommunication_template_CREATE) THEN 
@@ -98,7 +98,7 @@
 	    END IF;
 	    IF (var_per = var_per_txCommunication_messagereply_DELETE) THEN 
 	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
-	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_deleted AND "StateActive"=1),1);
 	    END IF;
 	    IF (var_per = var_txCommunication_messagegroup_CREATE) THEN 
 	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
@@ -106,12 +106,12 @@
 	    END IF;
 	    IF (var_per = var_txCommunication_messagegroup_DELETE) THEN 
 	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
-	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_deleted AND "StateActive"=1),1);
 	    END IF;
 	  	RAISE NOTICE 'permission id : %, content_type : %',var_per,var_ct;
 	  END LOOP grouppci;
 	  
-	  
+	  SELECT CommunicationTypeInsert(1,'email', '127.0.0.1');
 	  
 	 END;
 	$$ LANGUAGE plpgsql;

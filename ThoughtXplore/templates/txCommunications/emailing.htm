@@ -25,7 +25,7 @@
 
 
 <h4>Enter a new Template</h4>
-<form action="/messaging/email/addtemplate/" method="POST">
+<form action="/comm/email/addtemplate/" method="POST">
 <hr>
 <p>Author-User:
 <select name="authorID" id=""authorID"" title="Author User">
@@ -58,7 +58,7 @@
 
 
 <h4>Send an E-Mail</h4>
-<form action="/messaging/email/send/" method="POST">
+<form action="/comm/email/send/" method="POST">
 <hr>
 <p>From User:
 <select name="fromUserID_" id=""fromUserID"" title="From User">
@@ -66,16 +66,10 @@
 	<option value={{item.id}}>{{item.UserFirstName}}</option>
 	{% endfor %}
 </select></p>    
-<p>Email-Type:
-<select name="CommTypeID_" id=""CommTypeID"" title="Communication Type">
-	{% for item in EmailTypes %}
-	<option value={{item.id}}>{{item.TypeName}}</option>
-	{% endfor %}
-</select></p>    
 
 <p>Template-Type:
-<select name="TemplateID_" id=""EmailType"" title="Template Type" onchange="display_param_list()">
-	{% for item in EmailTemplate %}
+<select name="TemplateID_" id=""TemplateID"" title="Template Type" onchange="display_param_list()">
+	{% for item in Template %}
 	<option value={{item.id}}>{{item.TemplateName}}</option>
 	{% endfor %}
 </select><input type="button" value="Click" onclick="display_param_list()">

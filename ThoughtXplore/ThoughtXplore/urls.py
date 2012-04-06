@@ -28,6 +28,9 @@ urlpatterns = patterns('',
     url(r'^files/upload/status/$','txFileSystem.views.upload_File'),
     url(r'^messaging/email/$','txEmails.views.Indexaddtemplate'),
     url(r'^messaging/email/addtemplate/$','txEmails.views.addtemplate'),
+    url(r'^comm/email/$','txCommunications.views.Indexemail'),   
+    url(r'^comm/email/addtemplate/$','txCommunications.CommunicationFunctions.addtemplate'),   
+    url(r'^comm/email/send/$','txCommunications.views.sendemail'),   
     
     url(r'^messaging/email/send/$','txEmails.views.sendmail'),
 

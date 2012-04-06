@@ -1,8 +1,8 @@
 from ThoughtXplore.txUser.models import User
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 from DatabaseFunctions import *
-from ThoughtXplore.txEmails.views import send_mails
-from ThoughtXplore.txEmails.models import EmailTemplate, EmailMessageTypes
+from ThoughtXplore.txCommunications.models import Communication_Templates, Communication_Type
+from ThoughtXplore.txCommunications.CommunicationFunctions import send_mails
 
 class UserFnx(User):
     
@@ -43,22 +43,22 @@ class UserFnx(User):
         print "clear1"
         users_= User.objects.filter(UserEmail=email)
         user_admin=User.objects.filter(UserEmail="CreateUserDeamon@tx.com")
-        temp=EmailTemplate.objects.filter(TemplateName="Register")
-        emailtype=EmailMessageTypes.objects.filter(TypeName="Registration")
+        temp=Communication_Templates.objects.filter(TemplateName="Register")
+        commtype=Communication_Type.objects.filter(type="email")
         for i in temp:
             temp_id=i.id
         for i in users_:
             user_id= i.id
         for i in user_admin:
             user_id_admin= i.id
-        for i in emailtype:
-            emailtype_id=i.id
+        for i in commtype:
+            commtype_id=i.id
         print "here1"
         print user_id_admin
         print temp_id
         print email
         print user_id
-        print emailtype_id
+        print commtype_id
         if ( result[0][0] == 601 ):
             
             param={
@@ -68,7 +68,7 @@ class UserFnx(User):
                    'paramList':email,
                    'togroupIDs':[],
                    'touserIDs':[user_id],
-                   'EmailTypeID':emailtype_id,
+                   'CommTypeID':commtype_id,
                     'ip':ip,
                     'email_code_name':'Auth_Email'
 

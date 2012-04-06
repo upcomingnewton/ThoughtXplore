@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION CommunicationInsert(Author INTEGER,Commtype_id INTEGER, TemplateID INTEGER, 
 Subject text,ParameterDict TEXT,
-TimeStamp TEXT,Message TEXT, ToGroupID TEXT, ip TEXT, OUT result_index INTEGER,
+TimeStamp_ TEXT,Message TEXT, ToGroupID TEXT, ip TEXT, OUT result_index INTEGER,
 OUT result_sci INTEGER ) RETURNS RECORD AS $$
 
 DECLARE 
@@ -17,7 +17,7 @@ temp:=0;
 
 SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=Author;
 
-SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communication','txCommunication_comm_CREATE');
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txCommunications','communications','txCommunication_comm_CREATE');
 IF varrec.status <> 500 THEN
 	result_sci := -600;
 	result_index := varrec.status;
@@ -26,7 +26,7 @@ IF varrec.status <> 500 THEN
 END IF;
 /*  2. INSERT DATA INTO Communication Type table */
 
-	INSERT INTO "txCommunications_communications"("Commtype_id_id", "FromUserID_id","TemplateID_id","Subject", "ParameterDict", "DateTimeSent", "Message","SCI_id") values (Commtype_id,Author,TemplateID,Subject,ParameterDict, TimeStamp,Message, varrec.varsci);
+	INSERT INTO "txCommunications_communications"("Commtype_id_id", "FromUserID_id","TemplateID_id","Subject", "ParameterDict", "DateTimeSent", "Message","SCI_id") values (Commtype_id,Author,TemplateID,Subject,ParameterDict, TimeStamp_,Message, varrec.varsci);
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
@@ -37,11 +37,13 @@ IF temp <> 1 THEN
 END IF;
 SELECT "UserEmail" into email from "txUser_user" WHERE "id"=Author;
 SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+	--COMMIT;
+
 --RAISE NOTICE 'INSERT EMAIL TYPE, id IS %',in_userid;
 
 /*  3. INSERT DATA in txCommunications_communication_groups   */
 
-INSERT INTO "txCommunications_communication_groups"("Commtype_id_id", "comm_id_id", "Groups") Values (Commtype_id, (SELECT "id" from "txCommunications_communications" WHERE "FromUserID_id"=Author AND "DateTimeSent"= TimeStamp), ToGroupID);
+INSERT INTO "txCommunications_communication_groups"("Commtype_id_id", "comm_id_id", "Groups") Values (Commtype_id, (SELECT "id" from "txCommunications_communications" WHERE "FromUserID_id"=Author AND "DateTimeSent"= TimeStamp_), ToGroupID);
 
 /* 4. MAKE A LOG ENTRY */
 INSERT INTO "txCommunications_communicationlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
@@ -61,5 +63,4 @@ END IF;
 RETURN;
 END;
 $$ LANGUAGE plpgsql;
-
 
