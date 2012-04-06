@@ -70,7 +70,7 @@ class UserFnx(User):
                    'touserIDs':[user_id],
                    'CommTypeID':commtype_id,
                     'ip':ip,
-                    'email_code_name':'Auth_Email'
+                    'comm_code_name':'Auth_Email'
 
                    }
         print "lol"

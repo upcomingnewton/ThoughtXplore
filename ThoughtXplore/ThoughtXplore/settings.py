@@ -129,7 +129,6 @@ INSTALLED_APPS = (
     'txMiscLogs',
     'txUser',
     'txFileSystem',
-    'txEmails',
     'txCommunications'
 )
 

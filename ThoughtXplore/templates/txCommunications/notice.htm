@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>{{ title }}</title>
+
+
+</head>
+<body>
+<p>Folder List</p>
+<hr>
+{% for item in Folders %}
+<p>{{ item.name}}</p>
+{% endfor %}
+
+<table>
+<th>User-IDs</th>
+{% for item in Users %}
+	<tr>
+	<td>{{item.id}}-</td><td>{{item.UserFirstName}} {{item.UserLastName}}</td>
+	</tr>
+{% endfor %}
+
+</table>
+
+<h4>Send a Notice</h4>
+<form action="/comm/notice/send/" method="POST">
+<hr>
+<p>From User:
+<select name="fromUserID_" id=""fromUserID"" title="From User">
+	{% for item in Users %}
+	<option value={{item.id}}>{{item.UserFirstName}}</option>
+	{% endfor %}
+</select></p>    
+
+<p><label for=ToGroupIDs_>To GroupIDs:</label>
+    <input type="text" name="ToGroupIDs_" id="ToGroupIDs" ></textarea></p>
+<p><label for=Subject>Subject:</label>
+    <input type="text" name="Subject_" id="Subject" ></textarea></p>
+<p><label for=message>Notice:</label>
+    <textarea cols="40" rows="5" name="message" id="message_id" ></textarea></p>
+<input type="submit" value="Submit" />
+</form>
+
+
+</body>
+
+</html>

@@ -4,10 +4,48 @@ from cPickle import dumps, loads
 import string
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 from django.core.mail import send_mail
-from ThoughtXplore.txCommunications.DatabaseFunctions import DBInsertmail, DBInsertCommTemplate
+from ThoughtXplore.txCommunications.DatabaseFunctions import DBInsertComm, DBInsertCommTemplate
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpRequest,HttpResponse
+from ThoughtXplore.txMisc.MiscFunctions import split
+@csrf_exempt
+def send_notice(HttpRequest):
+    fromUserID= HttpRequest.POST["fromUserID_"]
+    for i in Communication_Type.objects.filter(type="notice"):
+        CommTypeID=i.id
+    for i in Communication_Templates.objects.filter(TemplateName="Default"):
+        TemplateID=i.id
+    subject= HttpRequest.POST["Subject_"]
+    togroupIDs= HttpRequest.POST["ToGroupIDs_"]
+    paramList= ""
+    if(togroupIDs!=""):
+        a=split(togroupIDs)
+        togroupIDs_=[int(i) for i in a]
+        
+    to_group_list=""
+    for i in togroupIDs_:
+        to_group_list+=str(i)+","
+    
+    paramList=dumps(paramList).encode("zip").encode("base64").strip()
+
+    param = {
+           'FromUserID':fromUserID,
+           'Subject':subject,
+           'CommTypeID':str(CommTypeID),
+           'TemplateID':str(TemplateID),
+           'ParameterDict':paramList,
+           'ToGroupIDs':to_group_list,
+           'ip':HttpRequest.META['REMOTE_ADDR'],
+           'comm_code_name': 'General Notice',
+           'Message':HttpRequest.POST['message'],
+           'TimeStamp':datetime.now(),
+
+            }
+    print param
+    DBInsertComm(param)
+    
+    HttpResponse("Done")
 
 @csrf_exempt
 def addtemplate(HttpRequest):
@@ -40,7 +78,7 @@ def addtemplate(HttpRequest):
 @csrf_exempt
 def send_mails(param):
     
-    email_code_name=param['email_code_name']
+    email_code_name=param['comm_code_name']
     print param
     to_id_list=[]
     if(email_code_name=='Auth_Email'):
@@ -129,5 +167,5 @@ def send_mails(param):
                                } 
     print sent_message
     print "sm"
-    DBInsertmail(sent_message)
+    DBInsertComm(sent_message)
     return 1

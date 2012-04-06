@@ -112,6 +112,9 @@
 	  END LOOP grouppci;
 	  
 	  SELECT CommunicationTypeInsert(1,'email', '127.0.0.1');
-	  
+	  SELECT CommunicationTypeInsert(1,'notice', '127.0.0.1');
+	  SELECT CommunicationTypeInsert(1,'message', '127.0.0.1');
+	  SELECT CommunicationTypeInsert(1,'sms', '127.0.0.1');
+	  	  
 	 END;
 	$$ LANGUAGE plpgsql;
