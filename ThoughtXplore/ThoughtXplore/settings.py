@@ -129,7 +129,8 @@ INSTALLED_APPS = (
     'txMiscLogs',
     'txUser',
     'txFileSystem',
-    'txEmails'
+    'txEmails',
+    'txCommunications'
 )
 
 # A sample logging configuration. The only tangible logging

@@ -1,0 +1,87 @@
+
+
+
+CREATE OR REPLACE FUNCTION insertgroup(name_ text, type_ text, cuser INTEGER,
+OUT result_index INTEGER,ip VARCHAR,
+OUT result_sci INTEGER ) RETURNS RECORD AS $$
+
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+    varrec1 RECORD;
+	by_user TEXT;
+	table_name TEXT;
+	
+BEGIN 
+temp:=0;
+/*  1. check if group exists or not    IF exists rs=602  */
+IF EXISTS ( SELECT id FROM "txMessaging_groups" WHERE "name"=name_) THEN
+	result_index := 602;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+/*  2. check if requesting user has right to insert this folder-type at this state  */
+
+/*
+SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=cuser;
+
+
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txMessaging','groups','INSERT');
+IF varrec.status <> 500 THEN
+	result_sci := -600;
+	result_index := varrec.status;
+    --   ROLLBACK;  
+	RETURN;
+END IF;
+*/
+/*  3. INSERT DATA INTO FileType table */
+
+ INSERT INTO "txMessaging_groups"("name", "type") values(name_, type_); 
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -600;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+END IF;
+
+--RAISE NOTICE 'INSERT USER, id IS %',cuser;
+
+/* 4.Create a table of this grouptype if type=sec */
+
+
+     
+IF type_='sec' THEN
+    
+      CREATE TABLE @name_(
+      			id 		INTEGER PRIMARY KEY,
+      			objid	INTEGER,
+      			users	TEXT
+      			);
+END IF;
+/*
+/* 5. MAKE A LOG ENTRY */
+INSERT INTO "txMessaging_messaginglogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,cuser,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -602;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	result_sci := varrec.varsci;
+	result_index := 601;
+	--COMMIT;
+END IF;
+
+*/
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
+

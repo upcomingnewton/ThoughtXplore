@@ -14,10 +14,7 @@
 	 var_per_txEMAILS_TEMPLATE_DELETE INTEGER;
 	 var_per_txEMAILS_EMAILTYPE_DELETE INTEGER;
 	 var_per_txEMAILS_EMAILS_SEND INTEGER;
-	 
-	 
-	 
-	 
+	 	 
 	 group_index INTEGER;
 	 var_user INTEGER;
 	 BEGIN

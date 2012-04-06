@@ -1,0 +1,117 @@
+	CREATE OR REPLACE FUNCTION two_initilaize_txCommunications_super_user_per() RETURNS VOID AS $$
+	DECLARE
+	 var_per INTEGER;
+	 var_ct INTEGER;
+	 var_pci RECORD;
+	 var_state_active INTEGER;
+	 var_state_deleted INTEGER;
+	 
+	 var_per_insert INTEGER;
+	 var_per_deleted INTEGER;
+	 var_per_update INTEGER;
+
+	 var_per_txCommunication_comm_CREATE INTEGER;
+	 var_per_txCommunication_comm_DELETE INTEGER;
+	 
+	 var_per_txCommunication_template_CREATE INTEGER;
+	 var_per_txCommunication_template_DELETE INTEGER;
+	 var_per_txCommunication_template_UPDATE INTEGER;
+	 
+	 var_per_txCommunication_commtype_CREATE INTEGER;
+	 var_per_txCommunication_commtype_DELETE INTEGER;
+	 var_per_txCommunication_commtype_UPDATE INTEGER;
+
+	 var_per_txCommunication_messagereply_SEND INTEGER;
+	 var_per_txCommunication_messagereply_DELETE INTEGER;
+	 
+	 var_txCommunication_messagegroup_CREATE INTEGER;
+	 var_txCommunication_messagegroup_DELETE INTEGER;
+	 	 
+	 group_index INTEGER;
+	 var_user INTEGER;
+	 BEGIN
+	 SELECT id INTO var_state_active FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE';  
+	 SELECT id INTO var_state_deleted FROM "txMisc_miscstate" WHERE "StateName"='DELETED'; 
+
+	 SELECT id INTO group_index FROM "txUser_group" WHERE "GroupName"='superusers';
+	 RAISE NOTICE 'STATE TABLE : active = %, deleted = %',var_state_active,var_state_deleted;
+	 
+	 SELECT id INTO var_per_txCommunication_comm_CREATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_comm_CREATE';
+	 SELECT id INTO var_per_txCommunication_comm_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_comm_DELETE';
+	 
+	 SELECT id INTO var_per_txCommunication_template_CREATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_template_CREATE';
+	 SELECT id INTO var_per_txCommunication_template_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_template_DELETE';
+	 SELECT id INTO var_per_txCommunication_template_UPDATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_template_UPDATE';
+	 
+	 SELECT id INTO var_per_txCommunication_commtype_CREATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_commtype_CREATE';
+	 SELECT id INTO var_per_txCommunication_commtype_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_commtype_DELETE';
+	 SELECT id INTO var_per_txCommunication_commtype_UPDATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_commtype_UPDATE';
+	 
+	 SELECT id INTO var_per_txCommunication_messagereply_SEND FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagereply_SEND';
+	 SELECT id INTO var_per_txCommunication_messagereply_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagereply_DELETE';
+	 
+	 SELECT id INTO var_txCommunication_messagegroup_CREATE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagereply_SEND';
+	 SELECT id INTO var_txCommunication_messagegroup_DELETE FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagereply_DELETE';
+	 
+	  <<grouppci>>
+	  FOR var_pci IN SELECT * FROM "txMisc_permissioncontenttype" LOOP
+	    var_ct := var_pci."PermissionContentType_id";
+	    var_per := var_pci."Permission_id";
+	    IF (var_per = var_per_txCommunication_comm_CREATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txCommunication_comm_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+	    END IF;
+	    
+	    IF (var_per = var_per_txCommunication_template_CREATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txCommunication_template_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_deleted AND "StateActive"=1),1);
+	    END IF;
+	    
+	    IF (var_per = var_per_txCommunication_template_UPDATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    
+	    IF (var_per = var_per_txCommunication_commtype_CREATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txCommunication_commtype_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_deleted AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txCommunication_commtype_UPDATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txCommunication_messagereply_SEND) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_per_txCommunication_messagereply_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_txCommunication_messagegroup_CREATE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_active AND "StateActive"=1),1);
+	    END IF;
+	    IF (var_per = var_txCommunication_messagegroup_DELETE) THEN 
+	    	INSERT INTO "txUser_grouppci"("Group_id","PCI_id","ResultingSCI_id","Active") 
+	    						   VALUES(group_index,var_pci.id,(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=var_ct AND "State_id"=var_state_delete AND "StateActive"=1),1);
+	    END IF;
+	  	RAISE NOTICE 'permission id : %, content_type : %',var_per,var_ct;
+	  END LOOP grouppci;
+	  
+	  
+	  
+	 END;
+	$$ LANGUAGE plpgsql;

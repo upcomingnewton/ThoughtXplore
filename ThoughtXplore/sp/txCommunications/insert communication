@@ -1,0 +1,65 @@
+CREATE OR REPLACE FUNCTION CommunicationInsert(Author INTEGER,Commtype_id INTEGER, TemplateID INTEGER, 
+Subject text,ParameterDict TEXT,
+TimeStamp TEXT,Message TEXT, ToGroupID TEXT, ip TEXT, OUT result_index INTEGER,
+OUT result_sci INTEGER ) RETURNS RECORD AS $$
+
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+    varrec1 RECORD;
+    email TEXT;
+	by_user TEXT;
+BEGIN 
+temp:=0;
+
+/*  1. check if requesting user has right to insert this comm at this state  */
+
+SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=Author;
+
+SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communication','txCommunication_comm_CREATE');
+IF varrec.status <> 500 THEN
+	result_sci := -600;
+	result_index := varrec.status;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+/*  2. INSERT DATA INTO Communication Type table */
+
+	INSERT INTO "txCommunications_communications"("Commtype_id_id", "FromUserID_id","TemplateID_id","Subject", "ParameterDict", "DateTimeSent", "Message","SCI_id") values (Commtype_id,Author,TemplateID,Subject,ParameterDict, TimeStamp,Message, varrec.varsci);
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -600;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+END IF;
+SELECT "UserEmail" into email from "txUser_user" WHERE "id"=Author;
+SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+--RAISE NOTICE 'INSERT EMAIL TYPE, id IS %',in_userid;
+
+/*  3. INSERT DATA in txCommunications_communication_groups   */
+
+INSERT INTO "txCommunications_communication_groups"("Commtype_id_id", "comm_id_id", "Groups") Values (Commtype_id, (SELECT "id" from "txCommunications_communications" WHERE "FromUserID_id"=Author AND "DateTimeSent"= TimeStamp), ToGroupID);
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txCommunications_communicationlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -602;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	result_sci := varrec.varsci;
+	result_index := 601;
+	--COMMIT;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+

@@ -1,0 +1,70 @@
+CREATE OR REPLACE FUNCTION CommunicationTypeUpdate(type_ VARCHAR, new_value_ VARCHAR,
+cuser INTEGER,
+ip VARCHAR,
+OUT result_index INTEGER,
+OUT result_sci INTEGER ) RETURNS RECORD AS $$
+
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+    varrec1 RECORD;
+    email TEXT;
+	by_user TEXT;
+BEGIN 
+temp:=0;
+/*  1. check if communication_type exists or not IF doesnt exists rs=603  */
+IF NOT EXISTS ( SELECT id FROM "txCommunications_communication_type" WHERE "type"=type_) THEN
+	result_index := 603;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+
+/*  2. check if requesting user has right to update this comm-type at this state  */
+SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=cuser;
+
+
+
+SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communication_type','txCommunication_commtype_UPDATE');
+IF varrec.status <> 500 THEN
+	result_sci := -600;
+	result_index := varrec.status;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+/*  3. UPDATE DATA in Communication Type table */
+
+	UPDATE "txCommunications_communication_type"
+	SET "type"= new_value_ WHERE "type"= type_;
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'Update Communication_type, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -600;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+END IF;
+SELECT "UserEmail" into email from "txUser_user" WHERE "id"=cuser;
+SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+--RAISE NOTICE 'INSERT EMAIL TYPE, id IS %',in_userid;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txCommunications_communicationlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result_sci := -602;
+	result_index := -601;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	result_sci := varrec.varsci;
+	result_index := 601;
+	--COMMIT;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+
