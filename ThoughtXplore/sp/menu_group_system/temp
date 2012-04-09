@@ -1,0 +1,21 @@
+SELECT * FROM txMenu_menu_insert('test1','test','test',-1,'test',1,'test');
+SELECT * FROM txMenu_menu_insert('test2','test','test',-1,'test',2,'test');
+SELECT * FROM txMenu_menu_insert('test3','test','test',-1,'test',3,'test');
+SELECT * FROM txMenu_menu_insert('test4','test','test',-1,'test',9999,'test');
+
+
+SELECT * FROM txMenu_menu_edit(12,'test3','test3','test3',90,'test3','UPDATE','test3','test3',1,'test3');
+mid INTEGER,
+mname VARCHAR,
+mdesc VARCHAR,
+murl VARCHAR,
+mpid INTEGER,
+micon VARCHAR,
+maction VARCHAR,
+log_desc VARCHAR,
+log_prev VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+)

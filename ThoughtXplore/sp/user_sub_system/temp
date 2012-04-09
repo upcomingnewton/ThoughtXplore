@@ -1,0 +1,50 @@
+SELECT * FROM one_system_initialize_user_system();
+SELECT * FROM two_system_initialize_user_system();
+SELECT * FROM
+SELECT * FROM
+SELECT * FROM
+SELECT * FROM
+SELECT * FROM
+SELECT * FROM
+
+SELECT * FROM txUser_user_edit(4,'test4@test.com','test4','f_test4','m_test4','l_test4','f',current_date,1,4,1,'test4','UPDATE','test4','test4');
+user_id INTEGER,
+email VARCHAR,
+pass VARCHAR,
+fname VARCHAR,
+mname VARCHAR,
+lname VARCHAR,
+gender VARCHAR,
+bday DATE,
+entity_id INTEGER,
+state_id INTEGER,
+by_user INTEGER,
+ip VARCHAR,
+maction VARCHAR,
+logdesc VARCHAR,
+logprevstate VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+)
+
+SELECT  txUser_user_insert( 'test1@test.com','test1','test1f','test1m','test1l','m',current_date,'system','INSERT',1,'test');
+SELECT * FROM  checkstatus('txUser_user','ACTIVE',1);
+SELECT * FROM user_login('test1@test.com','test1','testsite','test');
+SELECT * FROM user_login('admin1@tx.com','pass','testsite','test');
+SELECT * FROM txUser_user_edit(5,'testuser_1@testsystem.com','pass','first_name','middle_name','last_name','F',current_date,1,5,'admin1@tx.com','test','test','test');
+SELECT * FROM txUser_user_edit(5,'testuser_1@testsystem.com','pass','first_name','middle_name','last_name','F',current_date,1,2,'admin1@tx.com','test','test','test');
+SELECT * FROM  checkstatus('txUser_user','ACTIVE',5);
+SELECT * FROM  checkstatus('txUser_user','DELETED',5);
+SELECT * FROM txUser_user_authenicate('CreateUserDeamon@tx.com','AuthenticateUserDaemon@tx.com','test','USER_AU');
+SELECT * FROM  checkstatus('txUser_user','AUTHENTICATED',2);
+
+
+
+
+
+
+
+SELECT * FROM txUser_user_insert('testuser@test.com','testpass','fname_test','mname_test','lname_test','f',current_date,'system','INSERT','created_users','state=;group=;',1,'test');
+SELECT * FROM txUser_user_edit(5,'testuser@test.com','testpass','fname_changed','mname_changed','lname_changed','m',current_date,1,4,1,'test_changed','test_logsdesc','test_logsprev');
+SELECT * FROM user_login('testuser@test.com','testpass','ADMIN-SITE','test');
+SELECT * FROM txUser_user_statechange('5',1,'ACTIVE','ADMIN_AU','test','changing state for login');

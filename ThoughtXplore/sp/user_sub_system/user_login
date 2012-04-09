@@ -8,7 +8,8 @@ CREATE OR REPLACE FUNCTION user_login
 	OUT user_status INTEGER,
 	OUT loginid INTEGER,
 	OUT groupid INTEGER,
-	OUT result INTEGER
+	OUT result INTEGER,
+	OUT rescode INTEGER
 ) 
 RETURNS RECORD AS $$
 DECLARE
@@ -21,7 +22,8 @@ DECLARE
 BEGIN 
 --RAISE TIME 'time now is %',tmp;
 IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=emailid ) THEN
-	result := -651;
+	result := -1;
+	rescode = 651;
 	groupid := -1;
 	loginid := -1;
 	user_status := -1;
@@ -30,7 +32,8 @@ IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=emailid ) THEN
 END IF;
 
 IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=emailid AND "UserPassword"=password ) THEN
-	result := -652;
+	result := -1;
+	rescode = 652;
 	groupid := -1;
 	loginid := -1;
 	user_status := -1;
@@ -42,16 +45,18 @@ SELECT id INTO user__id FROM "txUser_user" WHERE "UserEmail"=emailid;
 SELECT * INTO varrec FROM  checkstatus('txUser_user','ACTIVE',user__id);
 user_status := varrec.scid;
 IF varrec.result < 0 THEN 
-	result := varrec.result;
+	rescode := varrec.result;
+	result := -6;
 	userid := user__id;	
-	loginid := -660;
+	loginid := -1;
 	SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
 	RETURN;
 END IF;
 
 SELECT id INTO login_type_int FROM "txUser_logintype" WHERE "LoginTypeName"=login_type;
 IF login_type_int IS NULL THEN 
-	result := -653;
+	rescode := 653;
+	result := -1;
 	userid := user__id;	
 	loginid := -1;
 	SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
@@ -61,9 +66,10 @@ END IF;
 
 SELECT * INTO varrec1 FROM  checkstatus('txUser_logintype','ACTIVE',login_type_int);
 IF varrec1.result < 0 THEN 
-	result := varrec.result1;
+	rescode := varrec1.result;
+	result := -7;
 	userid := user__id;	
-	loginid := -661;
+	loginid := -1;
 	SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
 	RETURN;
 END IF;
@@ -72,14 +78,16 @@ INSERT INTO "txUser_userloginlog"(user_id,"Login_From_id","LoginTime","LoginIP",
 VALUES(user__id,login_type_int,now(),ip,now());
 GET DIAGNOSTICS temp := ROW_COUNT;
 IF temp <> 1 THEN 
-	result := -654;
+	rescode := 654;
+	result := -1;
 	user_status := varrec.scid;
 	userid := user__id;	
 	loginid := -1;
 	SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
 	RETURN;
 ELSE
-	result := 650;
+	rescode := 650;
+	result := 1;
 	user_status := varrec.scid;
 	userid := user__id;	
 	SELECT id INTO loginid FROM "txUser_userloginlog" WHERE user_id=user__id AND "LoginIP"=ip;

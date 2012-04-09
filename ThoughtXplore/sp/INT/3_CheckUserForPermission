@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION  CheckUserForPermission(
-by_user VARCHAR,
+by_user INTEGER,
 applabel VARCHAR,
 modelreq VARCHAR,
 operation_requested VARCHAR,
@@ -39,7 +39,7 @@ SELECT id INTO usergroup_sci FROM "txMisc_statecontenttype"
 	AND "State_id"=( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE') 
 	AND "StateActive"=1;
 	
-IF NOT EXISTS (SELECT id FROM "txUser_user" WHERE "UserEmail"=by_user) THEN 
+IF NOT EXISTS (SELECT id FROM "txUser_user" WHERE id=by_user) THEN 
 		RAISE NOTICE 'USER DOES NOT EXISTS';
 		userid := -1;
 		varpci := -1;
@@ -47,7 +47,8 @@ IF NOT EXISTS (SELECT id FROM "txUser_user" WHERE "UserEmail"=by_user) THEN
 		status := -501;
 		RETURN;
 END IF;
-SELECT id INTO userid FROM "txUser_user" WHERE "UserEmail"=by_user;
+
+userid := by_user;
 SELECT "Group_id" INTO usergroup_grp FROM "txUser_usergroup"
 	WHERE "SCI_id"=usergroup_sci 
 	AND "User_id"=userid;

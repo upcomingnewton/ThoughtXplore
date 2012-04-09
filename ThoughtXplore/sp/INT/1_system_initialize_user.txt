@@ -33,8 +33,8 @@ var_per_insert INTEGER;
 var_per_del INTEGER;
 var_per_update  INTEGER;
 BEGIN 
-  RAISE NOTICE '=== making states for user system ===';
- 
+
+/* ======================= STATE TABLE ====================================  */ 
  DELETE FROM "txMisc_miscstate";
  INSERT INTO "txMisc_miscstate"("StateName","StateDescription") VALUES('ACTIVE','ACTIVE');
  INSERT INTO "txMisc_miscstate"("StateName","StateDescription") VALUES('DELETED','DELETED');
@@ -43,9 +43,10 @@ BEGIN
  INSERT INTO "txMisc_miscstate"("StateName","StateDescription") VALUES('AUTHENTICATED','AUTHENTICATED');
  SELECT id INTO var_state_active FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE';  
  SELECT id INTO var_state_del FROM "txMisc_miscstate" WHERE "StateName"='DELETED'; 
- RAISE NOTICE 'STATE TABLE : active = %, deleted = %',var_state_active,var_state_del;
  SELECT COUNT(id) INTO result FROM "txMisc_miscstate";
 RAISE NOTICE '[USER TRACE] ROW COUNT OF txMisc_miscstate is % ',result;
+
+/* =========================== PERMISSION TABLE ===============================  */ 
  
  DELETE FROM "txMisc_miscpermission";
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('INSERT','INSERT');
@@ -57,17 +58,20 @@ RAISE NOTICE '[USER TRACE] ROW COUNT OF txMisc_miscstate is % ',result;
  SELECT id INTO var_per_insert FROM "txMisc_miscpermission" WHERE "PermissionName"='INSERT';  
  SELECT id INTO var_per_del FROM "txMisc_miscpermission" WHERE "PermissionName"='DELETE'; 
  SELECT id INTO var_per_update FROM "txMisc_miscpermission" WHERE "PermissionName"='UPDATE'; 
- RAISE NOTICE 'PERMISSION TABLE : insert = %, update = %, delete=%',var_per_insert,var_per_update,var_per_del;
- SELECT COUNT(id) INTO result FROM "txMisc_miscpermission";
+SELECT COUNT(id) INTO result FROM "txMisc_miscpermission";
 RAISE NOTICE '[USER TRACE] ROW COUNT OF txMisc_miscpermission is % ',result;
  
+/* ===========================================================  */ 
+
  
 DELETE FROM "txMisc_permissioncontenttype";
 DELETE FROM "txMisc_statecontenttype"; 
 DELETE FROM "txUser_grouppci";
 DELETE FROM "txUser_userlogs";
  
-SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='user';
+/* ============================= CREATING STATES AND PERMISSIONS FOR USER ==============================  */ 
+ 
+ SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='user';
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_del,row_index,1);
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES((SELECT id  FROM "txMisc_miscstate" WHERE "StateName"='LOCKED'),row_index,1);
@@ -81,6 +85,8 @@ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentTyp
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES((SELECT id  FROM "txMisc_miscpermission" WHERE "PermissionName"='ADMIN_AU'),row_index,1);
 
 
+/* ============================= CREATING STATES AND PERMISSIONS FOR GROUP ==============================  */ 
+
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='group';
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_del,row_index,1);
@@ -88,11 +94,14 @@ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentTyp
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
 
+/* ============================= CREATING STATES AND PERMISSIONS FOR GROUP-TYPE ==============================  */ 
+
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='grouptype';
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_insert,row_index,1);
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
 
+/* ============================= CREATING STATES AND PERMISSIONS FOR GROUP PCI ==============================  */ 
 
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='grouppci';
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
@@ -101,11 +110,7 @@ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentTyp
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
 
-SELECT id INTO row_index FROM django_content_type WHERE app_label='txMisc' AND model='entity';
-INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
-INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_insert,row_index,1);
-INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
-
+/* ============================= CREATING STATES AND PERMISSIONS FOR USER GROUP ==============================  */ 
 
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='usergroup';
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
@@ -114,25 +119,8 @@ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentTyp
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
 
+/* ============================= CREATING STATES AND PERMISSIONS FOR LOGIN TYPE ==============================  */ 
 
-SELECT COUNT(id) INTO result FROM "txMisc_permissioncontenttype";
-RAISE NOTICE '[USER TRACE] ROW COUNT OF permissioncontenttype is % ',result;
-SELECT COUNT(id) INTO result FROM "txMisc_statecontenttype";
-RAISE NOTICE '[USER TRACE] ROW COUNT OF statecontenttype is % ',result;
-
-DELETE FROM "txUser_grouptype"; 
-INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('system','system');
-INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('primary','primary');
-INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('meta','meta');
-SELECT COUNT(id) INTO result FROM "txUser_grouptype";
-RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_grouptype is % ',result;
-
-DELETE FROM "txMisc_entity"; 
-INSERT INTO "txMisc_entity"("EntityName","EntityDescription","SCI_id") VALUES('system','system',(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=(SELECT id FROM django_content_type WHERE app_label='txMisc' AND model='entity') AND "State_id"=(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE') AND "StateActive"=1));
-SELECT COUNT(id) INTO result FROM "txMisc_entity";
-RAISE NOTICE '[USER TRACE] ROW COUNT OF txMisc_entity is % ',result;
-
-DELETE FROM "txUser_logintype";
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='logintype';
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
 INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_del,row_index,1);
@@ -140,9 +128,81 @@ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentTyp
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
 INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
 
+
+/* ============================= CREATING STATES AND PERMISSIONS FOR ENTITY ==============================  */ 
+
+SELECT id INTO row_index FROM django_content_type WHERE app_label='txMisc' AND model='entity';
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_insert,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
+
+
+/* ===========================================================  */ 
+
+SELECT COUNT(id) INTO result FROM "txMisc_permissioncontenttype";
+RAISE NOTICE '[USER TRACE] ROW COUNT OF permissioncontenttype is % ',result;
+SELECT COUNT(id) INTO result FROM "txMisc_statecontenttype";
+RAISE NOTICE '[USER TRACE] ROW COUNT OF statecontenttype is % ',result;
+
+/* ===========================================================  */ 
+
+
+/* ===============================================================  */ 
+/*				INITIALIZING MENU SYSTEMS   */
+/* ===============================================================  */ 
+
+/* ========================== MENU TABLE =================================  */ 
+
+SELECT id INTO row_index FROM django_content_type WHERE app_label='txMenu' AND model='menu';
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_del,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_insert,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
+
+/* ========================== GROUP MENU TABLE =================================  */ 
+
+SELECT id INTO row_index FROM django_content_type WHERE app_label='txMenu' AND model='groupmenu';
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_del,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_insert,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
+
+
+
+/* ===============================================================  */ 
+/*				INITIALIZING MISC entity DEFAULT VALUES    */
+/* ===============================================================  */
+
+DELETE FROM "txMisc_entity"; 
+INSERT INTO "txMisc_entity"("EntityName","EntityDescription","SCI_id") VALUES('system','system',(SELECT id  FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=(SELECT id FROM django_content_type WHERE app_label='txMisc' AND model='entity') AND "State_id"=(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE') AND "StateActive"=1));
+SELECT COUNT(id) INTO result FROM "txMisc_entity";
+RAISE NOTICE '[USER TRACE] ROW COUNT OF txMisc_entity is % ',result;
+
+/* ===============================================================  */ 
+/*				INITIALIZING USER SUB SYSTEM WITH DEFAULT VALUES    */
+/* ===============================================================  */ 
+
+/* ================== MAKING GROUP TYPES =========================================  */ 
+
+DELETE FROM "txUser_grouptype"; 
+INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('system','system');
+INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('primary','primary');
+INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('secondary','secondary');
+INSERT INTO "txUser_grouptype"("GroupTypeName","GroupTypeDescription") VALUES('meta','meta');
+SELECT COUNT(id) INTO result FROM "txUser_grouptype";
+RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_grouptype is % ',result;
+
+
+/* ================== MAKING LOGIN TYPES =========================================  */ 
+
+DELETE FROM "txUser_logintype";
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='logintype';
 SELECT id INTO var_groupsci_index FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=row_index AND "State_id"=var_state_active AND "StateActive"=1;
-INSERT INTO "txUser_logintype"("SCI_id","LoginTypeName") VALUES(var_groupsci_index,'testsite');
+INSERT INTO "txUser_logintype"("SCI_id","LoginTypeName") VALUES(var_groupsci_index,'ADMIN-SITE');
+
+/* ================== MAKING GROUPS =========================================  */ 
 
 DELETE FROM "txUser_group"; 
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='group';
@@ -159,7 +219,7 @@ SELECT COUNT(id) INTO result FROM "txUser_group";
 RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_group is % ',result;
 
 
-
+/* ================== MAKING USERS =========================================  */ 
 
 DELETE FROM "txUser_user"; 
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='user';
@@ -174,6 +234,7 @@ INSERT INTO "txUser_user"("UserEmail","UserPassword","UserFirstName","UserMiddle
 SELECT COUNT(id) INTO result FROM "txUser_user";
 RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_user is % ',result;
 
+/* ================== ADDING USERS TO GROUPS =========================================  */ 
 
 DELETE FROM "txUser_usergroup"; 
 SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='usergroup';

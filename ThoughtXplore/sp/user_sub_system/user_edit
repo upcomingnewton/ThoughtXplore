@@ -9,12 +9,13 @@ gender VARCHAR,
 bday DATE,
 entity_id INTEGER,
 state_id INTEGER,
-by_user VARCHAR,
+by_user INTEGER,
 ip VARCHAR,
 logdesc VARCHAR,
 logprevstate VARCHAR,
-OUT result_index INTEGER
-) RETURNS INTEGER AS $$
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
 DECLARE 
     recid INTEGER;
     varrec RECORD;
@@ -30,8 +31,9 @@ temp := 0;
 */
 
 
-IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=email) THEN
-	result_index := -676;
+IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE id=user_id) THEN
+	result := -1;
+	rescode := 676
       --  ROLLBACK;
 	RETURN;
 END IF;
@@ -40,7 +42,8 @@ END IF;
 /*  2. check if requesting user has right to update this user  */
 SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','user','UPDATE');
 IF varrec.status <> 500 THEN
-	result_index := varrec.status;
+	result := -2;
+	rescode := varrec.status;
 	RETURN;
 END IF;
 
@@ -58,7 +61,8 @@ SET "UserEmail" = email,
 WHERE id = user_id;
 GET DIAGNOSTICS temp := ROW_COUNT;
 IF temp <> 1 THEN 
-	result_index := -678;
+	result := -1;
+	rescode := 678;
         RETURN;
 END IF;
 
@@ -67,10 +71,12 @@ INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeS
 						VALUES(varrec.userid,varrec.varpci,user_id,now(),ip,logdesc,logprevstate);
 GET DIAGNOSTICS temp := ROW_COUNT;
 IF temp <> 1 THEN 
-	result_index := -679;
+	result := -1;
+	rescode := 679;
         RETURN;
 ELSE
-	result_index := 675;
+	result := 1;
+	rescode := 675;
 END IF;
 RETURN;
 END;

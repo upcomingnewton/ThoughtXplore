@@ -1,0 +1,69 @@
+CREATE OR REPLACE FUNCTION txMenu_menu_insert(
+mname VARCHAR,
+mdesc VARCHAR,
+murl VARCHAR,
+mpid INTEGER,
+micon VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    temp INTEGER;
+    menuid INTEGER;
+    varrec RECORD;
+BEGIN 
+temp := 0;
+/*
+1. check if same menu exists or not
+2. check if this user has permission for insertion orn not
+3. insert into menu table
+4. make a log entry
+*/
+
+/*  1. check if user exists or not   */
+IF EXISTS ( SELECT id FROM "txMenu_menu" WHERE "MenuUrl"=murl AND "MenuPid"=mpid ) THEN
+	RAISE NOTICE 'INSIDE IF';
+	result := 2;
+	rescode := 722;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+
+/*  2. check if requesting user has right to register this user at this state  */
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txMenu','menu','INSERT');
+IF varrec.status <> 500 THEN
+	result := -2;
+	rescode := varrec.status;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+
+/*  3. INSERT DATA INTO USER TABLE */
+INSERT INTO "txMenu_menu" ("MenuName","MenuUrl","MenuDesc","MenuPid","MenuIcon","SCI_id") 
+					VALUES (mname,murl,mdesc,mpid,micon,varrec.varsci);
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	result := -1;
+	rescode := 723;
+        RETURN;
+END IF;
+SELECT id INTO menuid FROM "txMenu_menu" WHERE "MenuUrl"=murl AND "MenuPid"=mpid;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,menuid,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	result := -1;
+	rescode := 724;
+        RETURN;
+ELSE
+	result := 1;
+	rescode := 720;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

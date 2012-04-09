@@ -15,6 +15,9 @@ class User(models.Model):
     SCI = models.ForeignKey(StateContentType)
     UserGender = models.CharField(max_length=1)
     
+    def __unicode__(self):
+        return self.UserEmail
+    
 class GroupType(models.Model):
     GroupTypeName = models.CharField(max_length=50)
     GroupTypeDescription = models.CharField(max_length=500)

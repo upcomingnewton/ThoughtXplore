@@ -17,7 +17,7 @@ temp:=0;
 
 SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=Author;
 
-SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txCommunications','communications','txCommunication_comm_CREATE');
+SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communications','txCommunication_comm_CREATE');
 IF varrec.status <> 500 THEN
 	result_sci := -600;
 	result_index := varrec.status;
@@ -63,4 +63,3 @@ END IF;
 RETURN;
 END;
 $$ LANGUAGE plpgsql;
-

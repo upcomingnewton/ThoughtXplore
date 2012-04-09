@@ -25,7 +25,7 @@ SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=cuser;
 
 
 
-SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communication_type','txCommunication_commtype_DELETE');
+SELECT * INTO varrec FROM CheckUserForPermission(cuser,'txCommunications','communication_type','txCommunication_commtype_DELETE');
 IF varrec.status <> 500 THEN
 	result_sci := -600;
 	result_index := varrec.status;
@@ -35,7 +35,7 @@ END IF;
 /*  3. DELETE DATA FROM Communication Type table */
 
 	DELETE FROM "txCommunications_communication_type" WHERE "type"=type_;
-	
+
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'DELETE Communication_type, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
@@ -68,5 +68,3 @@ END IF;
 RETURN;
 END;
 $$ LANGUAGE plpgsql;
-
-

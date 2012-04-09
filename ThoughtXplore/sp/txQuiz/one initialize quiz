@@ -6,25 +6,16 @@ Task:
 2) Insert in CommunicationTypes..
 
 */
-CREATE OR REPLACE FUNCTION one_initilaize_txCommunication() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION one_initilaize_txQuiz() RETURNS VOID AS $$
  
 DECLARE
 
  result INTEGER;
 BEGIN
-  RAISE NOTICE '=== initializing Communication-sub-system ===';
+  RAISE NOTICE '=== initializing Quiz-sub-system ===';
 
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_comm_CREATE','Create a new Communication');
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_comm_DELETE','Delete a Communication');
-
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_template_CREATE','Create Communication Template');
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_commtype_CREATE','Create Communication Type');
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_template_DELETE','Delete Communication Template');
-
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_commtype_DELETE','Delete Communication Type');
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_template_UPDATE','Update Communication Template');
- INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_commtype_UPDATE','Delete Communication Type');
-
+  
+ 
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_messagereply_SEND','Send Message Reply');
  INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_messagereply_DELETE','Delete a Message Reply');
 

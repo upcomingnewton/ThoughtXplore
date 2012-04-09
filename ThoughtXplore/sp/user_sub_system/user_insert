@@ -7,10 +7,13 @@ lname VARCHAR,
 gender VARCHAR,
 bday DATE,
 userentity VARCHAR,
-by_user VARCHAR,
+request_state VARCHAR,
+request_group VARCHAR,
+logsdec VARCHAR,
+by_user INTEGER,
 ip VARCHAR,
-OUT result_index INTEGER,
-OUT result_sci INTEGER
+OUT result INTEGER,
+OUT rescode INTEGER
 ) RETURNS RECORD AS $$
 DECLARE 
     temp INTEGER;
@@ -29,17 +32,26 @@ temp := 0;
 
 /*  1. check if user exists or not   */
 IF EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=email) THEN
-    SELECT "UserSCI_id" INTO result_sci  FROM "txUser_user" WHERE "UserEmail"=email;
-	result_index := 602;
+    SELECT "SCI_id" INTO rescode  FROM "txUser_user" WHERE "UserEmail"=email;
+	result := 2;
       --  ROLLBACK;
 	RETURN;
 END IF;
 
 /*  2. check if requesting user has right to register this user at this state  */
-SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','user','INSERT');
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','user',request_state);
 IF varrec.status <> 500 THEN
-	result_sci := -600;
-	result_index := varrec.status;
+	rescode :=  varrec.status;
+	result := -2;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+
+/* INSERT INTO USER-GROUP TABLE */
+SELECT * INTO varrec1 FROM CheckUserForPermission(by_user,'txUser','usergroup','INSERT');
+IF varrec.status <> 500 THEN
+	rescode := varrec1.status;
+	result :=-3;
      --   ROLLBACK;
 	RETURN;
 END IF;
@@ -50,8 +62,8 @@ INSERT INTO "txUser_user"("UserEmail","UserPassword","UserFirstName","UserMiddle
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
-	result_sci := -600;
-	result_index := -601;
+	rescode := 601;
+	result := -1;
       --  ROLLBACK;
         RETURN;
 END IF;
@@ -59,37 +71,29 @@ SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=email;
 --RAISE NOTICE 'INSERT USER, id IS %',in_userid;
 
 
-/* INSERT INTO USER-GROUP TABLE */
-SELECT * INTO varrec1 FROM CheckUserForPermission(by_user,'txUser','usergroup','INSERT');
-IF varrec.status <> 500 THEN
-	result_sci := -601;
-	result_index := varrec.status;
-     --   ROLLBACK;
-	RETURN;
-END IF;
 INSERT INTO "txUser_usergroup"("User_id","Group_id","SCI_id") 
-			VALUES(in_userid,(SELECT id FROM "txUser_group" where "GroupName"='created_users' ),varrec1.varsci);
+			VALUES(in_userid,(SELECT id FROM "txUser_group" where "GroupName"=request_group ),varrec1.varsci);
 --RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
-	result_sci := -601;
-	result_index := -601;
+	rescode := 602;
+	result := -1;
       --  ROLLBACK;
         RETURN;
 END IF;
 
 /* 4. MAKE A LOG ENTRY */
 INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
-						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,logsdec,'NULL');
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
-	result_sci := -602;
-	result_index := -601;
+	rescode := -603;
+	result := -1;
       --  ROLLBACK;
         RETURN;
 ELSE
-	result_sci := varrec.varsci;
-	result_index := 601;
+	rescode := varrec.varsci;
+	result := 1;
 	--COMMIT;
 END IF;
 RETURN;

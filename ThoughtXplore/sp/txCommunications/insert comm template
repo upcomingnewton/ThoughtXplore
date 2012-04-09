@@ -12,7 +12,7 @@ DECLARE
 BEGIN 
 temp:=0;
 /*  1. check if Communication template exists or not    IF exists rs=602  */
-IF EXISTS ( SELECT id FROM "txEmails_emailtemplate" WHERE "TemplateName"=TemplateName) THEN
+IF EXISTS ( SELECT id FROM "txCommunications_communication_templates" WHERE "TemplateName"=TemplateName) THEN
 	result_index := 602;
       --  ROLLBACK;
 	RETURN;
@@ -23,7 +23,7 @@ END IF;
 SELECT "UserEmail" into by_user FROM "txUser_user" WHERE id=Author;
 
 
-SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txCommunications','communication_templates','txCommunication_template_CREATE');
+SELECT * INTO varrec FROM CheckUserForPermission(Author,'txCommunications','communication_templates','txCommunication_template_CREATE');
 IF varrec.status <> 500 THEN
 	result_sci := -600;
 	result_index := varrec.status;
@@ -64,7 +64,6 @@ END IF;
 RETURN;
 END;
 $$ LANGUAGE plpgsql;
-
 
 
 

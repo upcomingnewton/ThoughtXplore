@@ -1,0 +1,40 @@
+{% extends "master1.html" %}
+    {% block title %}{{ title }}{% endblock %}
+	{% block add_start_script %}
+		<link type="text/css" href="{{STATIC_URL}}css/tables.css" rel="stylesheet" type="text/css" />
+	{% endblock %}
+	{% block master_content_center %}
+		<table id="hor-minimalist-a" class="tableclass" summary="Employee Pay Sheet">
+		    <thead>
+		    	<tr>
+		        	<th scope="col">Email</th>
+		            <th scope="col">BirthDate</th>
+		            <th scope="col">FirstName</th>
+		            <th scope="col">MiddleName</th>
+		            <th scope="col">LastName</th>
+		            <th scope="col">Entity</th>
+		            <th scope="col">SCI</th>
+		            <th scope="col">Gender</th>
+		        </tr>
+    		</thead>
+    	    <tbody>
+			{% if users|length %}
+				{% for user in users %}
+					<tr>
+						<td>{{ user.UserEmail }}</td>
+				        <td>{{ user.UserBirthDate }}</td>
+				        <td>{{ user.UserFirstName }}</td>
+				        <td>{{ user.UserMiddleName }}</td>
+				        <td>{{ user.UserLastName }}</td>
+				        <td>{{ user.UserEntity }}</td>
+				        <td>{{ user.SCI }}</td>
+				        <td>{{ user.UserGender }}</td>
+				    </tr>
+				{% endfor %}
+			{% else %}
+				<h1> there are no items {{users|length}}</h1>
+			{% endif %}
+			
+		    </tbody>
+		</table>
+	{% endblock %}   

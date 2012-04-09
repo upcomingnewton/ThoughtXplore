@@ -5,13 +5,14 @@ Created on Mar 3, 2012
 '''
 from ThoughtXplore.txDatabaseHelper import DBhelper
 
+#SELECT * FROM txUser_user_insert('testuser@test.com','testpass','fname_test','mname_test','lname_test','f',current_date,'system','INSERT','created_users','state=;group=;',1,'test');
+
 def DBInsertUser(userdetails):
-    query = "SELECT * FROM txUser_user_insert('" + userdetails['email'] + "','" + userdetails['pass'] + "','" + userdetails['fname'] + "','" + userdetails['mname'] + "','" + userdetails['lname'] + "','" + userdetails['gender'] + "','" + userdetails['bday'] + "','" + userdetails['entity'] + "','" + userdetails['by_email'] + "','" + userdetails['ip'] +"'); "
+    query = "SELECT * FROM txUser_user_insert('" + userdetails['email'] + "','" + userdetails['pass'] + "','" + userdetails['fname'] + "','" + userdetails['mname'] + "','" + userdetails['lname'] + "','" + userdetails['gender'] + "','" + userdetails['bday'] + "','" + userdetails['entity'] + "','" + userdetails['state'] + "','" + userdetails['group'] + "','" + userdetails['logsdesc'] + "','" + str(userdetails['by_email']) + "','" + userdetails['ip'] +"'); "
     print query
     result =  DBhelper.CallFunction(query)
-    print "here"
     print result
-    return result
+    return result[0]
     
 def DBLoginUser(logindetails):
     query = "SELECT * FROM user_login('" + logindetails['email'] + "','" + logindetails['pass'] + "','" + logindetails['login_type'] + "','" + logindetails['ip'] + "');"

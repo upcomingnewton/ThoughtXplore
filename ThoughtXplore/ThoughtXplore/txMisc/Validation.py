@@ -3,14 +3,17 @@ import re
 
 class EmailValidate():
     
-    def validate(self, email):
+    def __init__(self,email):
+        self.email = email
+        
+    def validate(self):
 
         if len(self.email) > 7:
             if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.email) != None:
                 return 1
         return 0
     
-class validatestring():
+class StringValidate():
     
     def validate_alphastring(self,st):
         if(st.isalpha()):
@@ -25,6 +28,3 @@ class validatestring():
             return 1
         return 0
     
-    
-            
-            

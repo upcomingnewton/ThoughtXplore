@@ -1,0 +1,60 @@
+CREATE OR REPLACE FUNCTION txUser_user_statechange(
+csv_userid VARCHAR,
+by_user INTEGER,
+request_state VARCHAR,
+request_permission VARCHAR,
+ip VARCHAR,
+logsdesc VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    varrec RECORD;
+    temp INTEGER;
+    log_entry VARCHAR;
+BEGIN 
+temp := 0;
+/*
+1. check if user exists or not 
+2. if does not exists , then check for all contraints 
+3. insert data
+4. check for inserted data
+5. insert logs , check for logs and commit
+*/
+
+/*  2. check if requesting user has right to update this user  */
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','user',request_permission);
+IF varrec.status <> 500 THEN
+	rescode :=  varrec.status;
+	result := -2;
+	RETURN;
+END IF;
+
+/*  3. UPDATE DATA INTO USER TABLE */
+
+EXECUTE 'UPDATE "txUser_user" SET "SCI_id"=$1 WHERE id in (' || csv_userid || ')' USING varrec.varsci;
+
+--UPDATE "txUser_user"
+--SET "SCI_id" = varrec.varsci
+--WHERE id in csv_userid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode :=  697;
+	result := -1;
+	RETURN;
+END IF;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,-1,now(),ip,logsdesc,'NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode :=  698;
+	result := -1;
+ELSE
+	rescode :=  695;
+	result := 1;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

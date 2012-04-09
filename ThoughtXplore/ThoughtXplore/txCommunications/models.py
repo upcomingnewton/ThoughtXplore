@@ -1,6 +1,6 @@
 from django.db import models
 from ThoughtXplore.txMisc.models import StateContentType, PermissionContentType
-from ThoughtXplore.txUser.models import User
+from ThoughtXplore.txUser.models import User, Group
 class Communication_Type(models.Model):
     type= models.CharField(max_length=100)
     SCI= models.ForeignKey(StateContentType)
@@ -26,7 +26,7 @@ class Communications(models.Model):
 class Communication_Groups(models.Model):
     Commtype_id=models.ForeignKey(Communication_Type)
     comm_id=models.ForeignKey(Communications)
-    Groups= models.TextField()
+    Groups= models.ForeignKey(Group)
 
 class Message_Replies(models.Model):
     Commtype_id=models.ForeignKey(Communication_Type)

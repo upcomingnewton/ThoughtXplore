@@ -32,7 +32,7 @@ END IF;
  RAISE NOTICE 'user id is %',user_id;
 
 /*  2. check if requesting user has right to update this user  */
-SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','user',type);
+SELECT * INTO varrec FROM CheckUserForPermission((SELECT id from "txUser_user" WHERE "UserEmail"=by_user),'txUser','user',type);
 IF varrec.status <> 500 THEN
 	result_index := varrec.status;
 	RETURN;

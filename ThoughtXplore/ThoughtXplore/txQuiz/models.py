@@ -17,8 +17,6 @@ class Subjects(models.Model):
 class Topics(models.Model):
     """
     
-    
-    
     """
     Topic_id= models.IntegerField()
     Subject_id= models.ForeignKey(Subjects)
