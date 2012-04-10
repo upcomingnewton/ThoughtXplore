@@ -247,6 +247,20 @@ END LOOP usergroup;
 SELECT COUNT(id) INTO result FROM "txUser_usergroup";
 RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_usergroup is % ',result;
 
+/* ============================= CREATING STATES AND PERMISSIONS FOR GROUP-TYPE ==============================  */ 
+
+
+SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND model='SecGroup_Comm';
+
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_active,row_index,1);
+
+INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(var_state_del,row_index,1);
+
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_insert,row_index,1);
+
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_update,row_index,1);
+
+INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id","PermissionActive") VALUES(var_per_del,row_index,1);
 
 END;
 $$ LANGUAGE plpgsql;

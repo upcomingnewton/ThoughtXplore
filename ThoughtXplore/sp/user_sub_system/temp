@@ -7,7 +7,7 @@ SELECT * FROM txUser_user_edit(4,'testuser@test.com','testpass','fname_changed',
 SELECT * FROM user_login('testuser@test.com','testpass','ADMIN-SITE','test');
 SELECT * FROM txUser_user_statechange('4',1,'ACTIVE','ADMIN_AU','test','changing state for login');
 SELECT * FROM txUser_group_insert('Group_Comm_EmailValidation','This group contans all people who have been sent email for validation',3,'system','INSERT',1,'test');
-SELECT * FROM SecGroup_Comm_insert(4,'INSERT','{"id":"txUser_user"}','[-1]','Validation Email Group Users',1,'test');
+SELECT * FROM SecGroup_Comm_insert(4,'INSERT','{"id":"txUser_user"}','-1','Validation Email Group Users',1,'test');
 SELECT * FROM SecGroup_Comm_appned(4,'2,3,-1','{"id":"txUser_user"}','UPDATE',1,'test','logsdesc','prevstate');
 
 

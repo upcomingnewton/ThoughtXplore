@@ -18,7 +18,7 @@ from ThoughtXplore.txUser.UserFunctions import UserFnx
 def send_validation_email(email,userid,fname,ip):
    
     
-    temp=Communication_Templates.objects.filter(TemplateName="Email_Validation1")  
+    temp=Communication_Templates.objects.filter(TemplateName="Email_Validation")  
     
     Subject="Account Creation"
     ##add user function
