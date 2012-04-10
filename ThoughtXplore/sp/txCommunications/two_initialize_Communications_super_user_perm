@@ -116,5 +116,8 @@
 	  PERFORM CommunicationTypeInsert(1,'message', '127.0.0.1');
 	  PERFORM CommunicationTypeInsert(1,'sms', '127.0.0.1');
 
+/*Adding group for email validation*/
+	  PERFORM txUser_group_insert('Group_Comm_EmailValidation','This group contans all people who have been sent email for validation',3,'system','INSERT',1,'test');
+	  
 	 END;
 	$$ LANGUAGE plpgsql;

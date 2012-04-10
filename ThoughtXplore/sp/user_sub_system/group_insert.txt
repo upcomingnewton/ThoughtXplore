@@ -1,0 +1,77 @@
+CREATE OR REPLACE FUNCTION txUser_group_insert(
+group_name VARCHAR,
+group_desc VARCHAR,
+type INTEGER,
+entity VARCHAR,
+request_state VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    temp INTEGER;
+    gid INTEGER;
+    varrec RECORD;
+BEGIN 
+temp := 0;
+/*
+1. check if group exists or not 
+2. if does not exists , then check for all contraints 
+3. insert data
+4. check for inserted data
+5. insert logs , check for logs and commit
+*/
+
+/*  1. check if group exists or not   */
+IF EXISTS ( SELECT id FROM "txUser_group" WHERE "GroupName"=group_name) THEN
+    SELECT "SCI_id" INTO rescode  FROM "txUser_group" WHERE "GroupName"=group_name;
+	result := 2;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+
+/*  2. check if requesting user has right to register this user at this state  */
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','group',request_state);
+IF varrec.status <> 500 THEN
+	rescode :=  varrec.status;
+	result := -2;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+
+
+
+/*  3. INSERT DATA INTO USER TABLE */
+INSERT INTO "txUser_group"("GroupName","GroupDescription","GroupType_id","SCI_id","GroupEntity_id") 
+		VALUES(group_name,group_desc,type,varrec.varsci,(SELECT id FROM "txMisc_entity" WHERE "EntityName"=entity));
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	rescode := 701;
+	result := -1;
+      --  ROLLBACK;
+        RETURN;
+END IF;
+--RAISE NOTICE 'INSERT USER, id IS %',in_userid;
+
+ SELECT id INTO gid FROM "txUser_group" WHERE "GroupName"=group_name;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+			VALUES(varrec.userid,varrec.varpci,gid,now(),ip,'NULL','NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	rescode := -703;
+	result := -1;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	rescode := gid;
+	result := 1;
+	--COMMIT;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

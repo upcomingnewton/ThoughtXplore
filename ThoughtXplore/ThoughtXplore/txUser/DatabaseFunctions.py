@@ -23,3 +23,21 @@ def DBAuthenicateUser(auth_details):
     print query
     result =  DBhelper.CallFunction(query)
     return result
+
+def DBCreateGroup(details):
+    query = "SELECT * FROM txUser_group_insert('" + details['name'] + "','" + details['desc'] + "','" + details['type'] + "','" + details['entity'] + "','" + details['permission'] + "','" + details['by'] + "','" + details['ip'] + "');"
+    print query
+    #result =  DBhelper.CallFunction(query)
+    #return result
+
+def DBCreateSecGroupForCommunications(details):
+    query = "SELECT * FROM  SecGroup_Comm_insert('" + details['groupid'] + "','" + details['permission'] + "','" + details['params'] + "','[-1]','" + details['logdesc'] + "'," + details['by'] + ",'" + details['ip'] + "');"
+    print query
+    #result =  DBhelper.CallFunction(query)
+    #return result
+
+def DBAddUsertoSecGroupForCommunications(details):
+    query= "SELECT * FROM SecGroup_Comm_appned(" + str(details['groupid']) + ",'" + details['userid'] + "','" + details['params'] + "','" + details['permission'] + "'," + str(details['by']) + ",'" + details['ip'] + "','" + details['logdesc'] + "','" + details['prevstate'] + "');"
+    print query
+    result =  DBhelper.CallFunction(query)
+    #return result

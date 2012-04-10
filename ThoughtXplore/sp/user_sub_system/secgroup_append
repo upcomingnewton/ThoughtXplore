@@ -1,0 +1,60 @@
+CREATE OR REPLACE FUNCTION SecGroup_Comm_appned(
+groupid INTEGER,
+user_details VARCHAR,
+params VARCHAR,
+request_perm VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+logsdesc VARCHAR,
+prevstate VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+BEGIN 
+temp := 0;
+
+IF NOT EXISTS ( SELECT id FROM "txUser_secgroup_comm" WHERE "Group_id"=groupid) THEN
+	result := -1;
+	rescode := 731;
+	RETURN;
+END IF;
+
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','secgroup_comm',request_perm);
+IF varrec.status <> 500 THEN
+	rescode :=  varrec.status;
+	result := -2;
+	RETURN;
+END IF;
+
+
+UPDATE "txUser_secgroup_comm"
+SET "SCI_id"=varrec.varsci,
+     "User"=user_details,
+     "LastUpdate"=now(),
+     "UserParams"=params 
+WHERE "Group_id"=groupid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode := 732;
+	result := -1;
+        RETURN;
+END IF;
+
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,groupid,now(),ip,logsdesc,prevstate);
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode := 733;
+	result := -1;
+        RETURN;
+ELSE
+	rescode := 1;
+	result := 1;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

@@ -92,7 +92,7 @@ IF temp <> 1 THEN
       --  ROLLBACK;
         RETURN;
 ELSE
-	rescode := varrec.varsci;
+	rescode := in_userid;
 	result := 1;
 	--COMMIT;
 END IF;

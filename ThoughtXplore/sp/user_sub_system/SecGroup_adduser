@@ -1,0 +1,56 @@
+CREATE OR REPLACE FUNCTION SecGroup_Comm_insert(
+groupid INTEGER,
+request_state VARCHAR,
+params VARCHAR,
+user_details VARCHAR,
+logsdesc VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    temp INTEGER;
+    in_userid INTEGER;
+    varrec RECORD;
+BEGIN 
+temp := 0;
+
+IF EXISTS ( SELECT id FROM "txUser_secgroup_comm" WHERE "Group_id"=groupid) THEN
+    SELECT "SCI_id" INTO rescode  FROM "txUser_secgroup_comm" WHERE "Group_id"=groupid;
+	result := 2;
+	RETURN;
+END IF;
+
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','secgroup_comm',request_state);
+IF varrec.status <> 500 THEN
+	rescode :=  varrec.status;
+	result := -2;
+	RETURN;
+END IF;
+
+
+INSERT INTO "txUser_secgroup_comm"("Group_id","SCI_id","User","LastUpdate","UserParams") 
+			VALUES(groupid,varrec.varsci,user_details,now(),params);
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode := 721;
+	result := -1;
+        RETURN;
+END IF;
+
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,groupid,now(),ip,logsdesc,'NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	rescode := 723;
+	result := -1;
+        RETURN;
+ELSE
+	rescode := 1;
+	result := 1;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

@@ -1,5 +1,5 @@
 from ThoughtXplore.txUser.models import User, UserGroup, Group
-from ThoughtXplore.txCommunications.models import Communication_Templates, Communication_Type
+from ThoughtXplore.txCommunications.models import Communication_Templates, Communication_Type,Communication_Groups
 from cPickle import dumps, loads
 import string
 from ThoughtXplore.txMisc.enc_dec import Encrypt
@@ -9,36 +9,60 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpRequest,HttpResponse
 from ThoughtXplore.txMisc.MiscFunctions import split
+from ThoughtXplore import CONFIG
+from ThoughtXplore.txUser.UserFunctions import UserFnx
+
 @csrf_exempt
 
 
-def send_validation_email(email,ip):
+def send_validation_email(email,userid,fname,ip):
    
-    temp=Communication_Templates.objects.filter(TemplateName="Email_Validation")
-    users_= User.objects.filter(UserEmail=email)
-    for i in users_:
-            user_fn= i.UserFirstName    
+    
+    temp=Communication_Templates.objects.filter(TemplateName="Email_Validation1")  
+    
     Subject="Account Creation"
     ##add user function
     #send email
     for e in temp:
         Template=loads(e.TemplateFormat.decode("base64").decode("zip"))
         reqparam=loads(e.paramList.decode("base64").decode("zip"))
+    print "template here"
+    print reqparam
     encdec=Encrypt()
     token=encdec.encrypt(email)
     token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/"
     #token="http://uiet.thoughtexplore.com/user/authenticate/email/"+token+"/"
-    print token
-    param_list_=[user_fn,token]    
+    
+    param_list_=[fname]    
+    
     reqparam_=string.split(reqparam,',')
+    
     param_list_.append(str(token))
     for i,v in zip(reqparam_,param_list_):    
         Template=Template.replace(i, v)
     message=Template
+    '''
+    not needed -sarvpriye
+    # here is what you need to do 
+    # 1. add an entry to communication type of "email"
+    # 2. add an entry to communication for all this template and all
+    '''
+    #to get group id of group named as "Group_Comm_EmailValidation"
+    group=Group.objects.filter(GroupName="Group_Comm_EmailValidation")
+    userlist=str(userid)+","
+    
+    for i in group:
+        group_id=i.id
+    userfnx=UserFnx()
+    print "user list"
+    print userlist
+    
     print "till here too"
     send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
     print "email sent with message as"
     print message
+    userfnx.AddUserToSecGroupForComm(group_id, userlist, 1, ip)
+    
 
 def send_notice(HttpRequest):
     fromUserID= HttpRequest.POST["fromUserID_"]

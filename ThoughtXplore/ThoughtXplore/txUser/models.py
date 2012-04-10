@@ -40,6 +40,13 @@ class UserGroup(models.Model):
     Group = models.ForeignKey(Group)
     SCI = models.ForeignKey(StateContentType)
     
+class SecGroup_Comm(models.Model):
+    Group = models.ForeignKey(Group)
+    SCI = models.ForeignKey(StateContentType)
+    User = models.TextField()
+    LastUpdate = models.DateTimeField()
+    UserParams = models.CharField(max_length=500)
+    
 class UserLogs(models.Model):
     # user making changes
     LogsUser = models.ForeignKey(User)
