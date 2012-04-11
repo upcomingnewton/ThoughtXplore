@@ -11,26 +11,23 @@ from django.http import HttpRequest,HttpResponse
 from ThoughtXplore.txMisc.MiscFunctions import split
 from ThoughtXplore import CONFIG
 from ThoughtXplore.txUser.UserFunctions import UserFnx
+import time
 
-@csrf_exempt
 
 
 def send_validation_email(email,userid,fname,ip):
    
-    
     temp=Communication_Templates.objects.filter(TemplateName="Email_Validation")  
-    
     Subject="Account Creation"
     ##add user function
     #send email
     for e in temp:
         Template=loads(e.TemplateFormat.decode("base64").decode("zip"))
         reqparam=loads(e.paramList.decode("base64").decode("zip"))
-    print "template here"
-    print reqparam
     encdec=Encrypt()
-    token=encdec.encrypt(email)
-    token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/"
+    token=encdec.encrypt(str(userid) + '___' + email)
+    refs = int(time.time())
+    token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/" + str(refs) + "/"
     #token="http://uiet.thoughtexplore.com/user/authenticate/email/"+token+"/"
     
     param_list_=[fname]    
@@ -61,8 +58,9 @@ def send_validation_email(email,userid,fname,ip):
     send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
     print "email sent with message as"
     print message
-    userfnx.AddUserToSecGroupForComm(group_id, userlist, 1, ip)
-    
+    result= userfnx.AddUserToSecGroupForComm(group_id, userlist, 1, ip)
+    print result
+    return result
 
 def send_notice(HttpRequest):
     fromUserID= HttpRequest.POST["fromUserID_"]
@@ -101,7 +99,7 @@ def send_notice(HttpRequest):
     
     HttpResponse("Done")
 
-@csrf_exempt
+
 def addtemplate(HttpRequest):
     authorID= int(HttpRequest.POST["authorID"])
     CommType=Communication_Type.objects.filter(type="email")
@@ -128,7 +126,7 @@ def addtemplate(HttpRequest):
     
     return HttpResponse("Done")
 
-@csrf_exempt
+
 def send_mails(param):
     
     email_code_name=param['comm_code_name']

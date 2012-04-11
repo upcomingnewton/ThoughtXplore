@@ -14,12 +14,11 @@ class UserFnx(models.Model):
     def AuthenticateUserFromSite(self,emailid,ip):
         # 1. call authentication db script
         to_emailid = self.encrypt.decrypt(emailid)
+        s = to_emailid.split('___')
+        print s
         print to_emailid
-        res = DBAuthenicateUser({'to_email':to_emailid,'by_email':'AuthenticateUserDaemon@tx.com','ip':ip,'type':'USER_AU'})
-        if ( res[0][0] == 695 ):
-            # call here user email system
-            print 'hi'
-        return res
+        result = DBAuthenicateUser({'to_email':s[0],'by_email':'2','state':'AUTHENTICATED','perm':'USER_AU','ip':ip,'logsdesc':'USER_AU'})
+        return( int(result[0]),decode(int(result[0]),result[1],'AuthenticateUserFromSite'))
         
     def InsertUserFromSite(self,email,password,fname,mname,lname,gender,bday,entity,ip):
         user = {'email':email, 
@@ -36,12 +35,10 @@ class UserFnx(models.Model):
                 'by_email':2,
                 'ip':ip}
         result = DBInsertUser(user)
-        
-        if( int(result[0]) == 1 ):
-         return (result[0],int(result[1]))
+        if( int(result[0]) >= 1):
+            return (result[0],int(result[1]),decode(int(result[0]), result[1],'InsertUserFromSite'))
         else:
-         return (result[0],decode(int(result[0]), result[1]))
-        
+            return (result[0],decode(int(result[0]), result[1],'InsertUserFromSite'))
     
     def LoginUser(self,email,password,_type,ip):
         details = {'email':email,
@@ -62,7 +59,7 @@ class UserFnx(models.Model):
                         'ip':ip
                    }
         result = DBCreateGroup(details)
-        return (result[0],decode(int(result[0]), result[1]))
+        return (result[0],decode(int(result[0]), result[1],'CreateNewGroup'))
     
     def CreateSecGroupForComm(self,groupid,params,logsdec,by,ip):
         details = {
@@ -74,7 +71,7 @@ class UserFnx(models.Model):
                     'ip':ip
                    }
         result = DBCreateSecGroupForCommunications(details)
-        return (result[0],decode(int(result[0]), result[1]))
+        return (result[0],decode(int(result[0]), result[1],'CreateSecGroupForComm'))
     
     def AddUserToSecGroupForComm(self,groupid,userlist,by,ip):
         d = SecGroup_Comm.objects.all()
@@ -84,18 +81,10 @@ class UserFnx(models.Model):
         params = ''
         for x in d:
             #print x.id
-          if ( x.Group.id == groupid):
-
-
+            if ( x.Group.id == groupid):
                 params = x.UserParams
-
-
                 prev = dumps(x.User).encode("zip").encode("base64").strip()
-
-
                 t = x.User + ',' + userlist + '-1'
-
-
         details = {
                    'groupid':groupid,
                     'userid':str(t),
@@ -106,6 +95,5 @@ class UserFnx(models.Model):
                     'by':by,
                     'ip':ip
                    }
-        print 
         result = DBAddUsertoSecGroupForCommunications(details)
-        return (result[0],decode(int(result[0]), result[1]))
+        return (result[0],decode(int(result[0][0]), result[0][1],'AddUserToSecGroupForComm'))

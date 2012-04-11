@@ -40,4 +40,4 @@ def DBAddUsertoSecGroupForCommunications(details):
     query= "SELECT * FROM SecGroup_Comm_appned(" + str(details['groupid']) + ",'" + details['userid'] + "','" + details['params'] + "','" + details['permission'] + "'," + str(details['by']) + ",'" + details['ip'] + "','" + details['logdesc'] + "','" + details['prevstate'] + "');"
     print query
     result =  DBhelper.CallFunction(query)
-    #return result
+    return result

@@ -9,13 +9,22 @@ from ThoughtXplore.txMisc.Validation import EmailValidate , StringValidate
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 from django.core.urlresolvers import reverse
 from ThoughtXplore.txCommunications.CommunicationFunctions import send_validation_email
-  
-def AuthenticateUserFromEmail(HttpRequest,token):
+
+
+    
+    
+    
+def AuthenticateUserFromEmail(HttpRequest,token,refs):
     au_user = UserFnx()
+    print refs
     try:
-        print 'printing from view  '  + token
-        res = au_user.AuthenticateUserFromSite(token, HttpRequest.META['REMOTE_ADDR'])
-        return HttpResponse("you are viewing status of user registeration "  + str(res))
+        print 'printing from AuthenticateUserFromEmail  '  + token
+        result = au_user.AuthenticateUserFromSite(token, HttpRequest.META['REMOTE_ADDR'])
+        print result
+        if( result[0] >= 1 ):
+            encrypt = Encrypt()
+            return redirect('/message/' + encrypt.encrypt( str(result[1])) + '/')
+
     except:
         return HttpResponse("error")
     
@@ -41,8 +50,9 @@ def MessageIndex(request,message):
 def ListUsers(request):
     return render_to_response("txUser/ListUsers.html",{'title':'list users', 'users':User.objects.all()},context_instance=RequestContext(request))
 
+
 def CreateUserIndex(request):
-    return render_to_response('main/Register.html',{'title':'create user page'},context_instance=RequestContext(request))
+    return render_to_response('main/Register.html',{'title':'User Registration'},context_instance=RequestContext(request))
 
 
     
@@ -63,7 +73,8 @@ def CreateUserFromSite(HttpRequest):
     if(str_val.validate_alphastring(fname) != 1):
             errorlist.append('first name should contain only alphabets')
     mname = HttpRequest.POST['RegisterUser_mname']
-    if(str_val.validate_alphastring(mname) != 1):
+    if( len(mname) > 0 ):
+        if(str_val.validate_alphastring(mname) != 1):
             errorlist.append('middle name should contain only alphabets')
     lname = HttpRequest.POST['RegisterUser_lname']
     if(str_val.validate_alphastring(lname) != 1):
@@ -77,20 +88,19 @@ def CreateUserFromSite(HttpRequest):
     gender = HttpRequest.POST['RegisterUser_gender']
     if gender== "-1" :
         errorlist.append('Please select your gender')
-            
-            
+        
     if ( len(errorlist) > 0 ):
-        return render_to_response('txUser/CreateUser.html',{'title':'create user page','errorlist':errorlist,'POST_DATA':HttpRequest.POST},context_instance=RequestContext(HttpRequest))
+        return render_to_response('main/Register.html',{'title':'create user page','errorlist':errorlist,'POST_DATA':HttpRequest.POST},context_instance=RequestContext(HttpRequest))
     else:
         insfnx = UserFnx()
         result = insfnx.InsertUserFromSite(email, pass2, fname, mname, lname, gender, bday,'system',HttpRequest.META['REMOTE_ADDR'])
-    print "here"
-    print result
-    
-    if( result[0] == 1 ):
+    if( result[0] >= 1 ):
         send_validation_email(email, result[1], fname, HttpRequest.META['REMOTE_ADDR'])
-        
+        print result[2]
+        print "this"
         encrypt = Encrypt()
-        return redirect('/message/' + encrypt.encrypt( str(result[1])) + '/')
+        a= '/message/' + encrypt.encrypt( str(result[2])) + '/'
+        print a
+        return redirect(str(a))
 
 

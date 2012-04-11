@@ -6,10 +6,10 @@ from ThoughtXplore.txCommunications.models import Communication_Type,\
     Communication_Templates
 from cPickle import dumps, loads
 from django.shortcuts import render_to_response
-from django.views.decorators.csrf import csrf_exempt
+from django.template import RequestContext , loader
 from ThoughtXplore.txCommunications.CommunicationFunctions import send_mails
 
-@csrf_exempt
+
 def Indexnotices(request):
     user_= User.objects.all()
     CommType=Communication_Type.objects.filter(type="notice")
@@ -29,9 +29,9 @@ def Indexnotices(request):
         temp=[item.TemplateName,loads(item.paramList.decode("base64").decode("zip")) ]
         param_list_to_send.append(temp)   
     print "here3"
-    return render_to_response('txCommunications/notice.htm',{'title':'Notices','Users':user_,'CommType' :CommType, 'Template':TemplateID, 'paramlist': param_list_to_send})
+    return render_to_response('txCommunications/notice.htm',{'title':'Notices','Users':user_,'CommType' :CommType, 'Template':TemplateID, 'paramlist': param_list_to_send},context_instance=RequestContext(request))
 
-@csrf_exempt
+
 def Indexemail(request):
     user_= User.objects.all()
     CommType=Communication_Type.objects.filter(type="email")
@@ -51,9 +51,9 @@ def Indexemail(request):
         temp=[item.TemplateName,loads(item.paramList.decode("base64").decode("zip")) ]
         param_list_to_send.append(temp)   
     print "here3"
-    return render_to_response('txCommunications/emailing.htm',{'title':'Email','Users':user_,'CommType' :CommType, 'Template':TemplateID, 'paramlist': param_list_to_send})
+    return render_to_response('txCommunications/emailing.htm',{'title':'Email','Users':user_,'CommType' :CommType, 'Template':TemplateID, 'paramlist': param_list_to_send},context_instance=RequestContext(request))
 
-@csrf_exempt    
+    
 def sendemail(HttpRequest):
     
     fromUserID= HttpRequest.POST["fromUserID_"]
