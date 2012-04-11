@@ -6,7 +6,7 @@ from django.conf.urls.defaults import patterns, include, url
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'ThoughtXplore.views.home', name='home'),
+     url(r'^$', 'ThoughtXplore.views.Index', name='home'),
     # url(r'^ThoughtXplore/', include('ThoughtXplore.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
@@ -19,6 +19,10 @@ urlpatterns = patterns('',
     url(r'^user/register/$','txUser.views.CreateUserIndex'),
     url(r'^user/register/new/$','txUser.views.CreateUserFromSite'),
     url(r'^message/(?P<message>\S+)/$','txUser.views.MessageIndex'),
+    url(r'^note/vice-chancellor/$','ThoughtXplore.views.NoteVCIndex'),
+    url(r'^note/director/$','ThoughtXplore.views.NoteDirIndex'),
+    url(r'^note/tpo/$','ThoughtXplore.views.NotetpoIndex'),
+
     #url(r'^user/register/$','txUser.views.Index'),
     #url(r'^user/fb/register/$','txUserfb.views.Index'),
     #url(r'^user/fb/register/register$','txUserfb.views.RegisterUser'),

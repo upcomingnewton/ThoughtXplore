@@ -1,0 +1,63 @@
+CREATE OR REPLACE FUNCTION txUser_user_authenicate(
+email VARCHAR,
+by_user VARCHAR,
+ip VARCHAR,
+type VARCHAR,
+OUT result_index INTEGER
+) RETURNS INTEGER AS $$
+DECLARE 
+	user_id INTEGER;
+    varrec RECORD;
+    temp INTEGER;
+    log_entry VARCHAR;
+BEGIN 
+temp := 0;
+log_entry := 'AUTHETICATION-' || type;
+/*
+1. check if user exists or not 
+2. if does not exists , then check for all contraints 
+3. insert data
+4. check for inserted data
+5. insert logs , check for logs and commit
+*/
+
+
+IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=email) THEN
+	result_index := -696;
+      --  ROLLBACK;
+	RETURN;
+END IF;
+
+ SELECT id INTO user_id FROM "txUser_user" WHERE "UserEmail"=email;
+ RAISE NOTICE 'user id is %',user_id;
+
+/*  2. check if requesting user has right to update this user  */
+SELECT * INTO varrec FROM CheckUserForPermission((SELECT id from "txUser_user" WHERE "UserEmail"=by_user),'txUser','user',type);
+IF varrec.status <> 500 THEN
+	result_index := varrec.status;
+	RETURN;
+END IF;
+
+/*  3. UPDATE DATA INTO USER TABLE */
+UPDATE "txUser_user"
+SET "SCI_id" = varrec.varsci
+WHERE "UserEmail"=email;
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	result_index := -697;
+        RETURN;
+END IF;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,user_id,now(),ip,log_entry,'NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	result_index := -698;
+        RETURN;
+ELSE
+	result_index := 695;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

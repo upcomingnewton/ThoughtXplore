@@ -9,10 +9,7 @@ from ThoughtXplore.txMisc.Validation import EmailValidate , StringValidate
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 from django.core.urlresolvers import reverse
 from ThoughtXplore.txCommunications.CommunicationFunctions import send_validation_email
-
-    
-    
-    
+  
 def AuthenticateUserFromEmail(HttpRequest,token):
     au_user = UserFnx()
     try:
@@ -44,9 +41,8 @@ def MessageIndex(request,message):
 def ListUsers(request):
     return render_to_response("txUser/ListUsers.html",{'title':'list users', 'users':User.objects.all()},context_instance=RequestContext(request))
 
-
 def CreateUserIndex(request):
-    return render_to_response('txUser/CreateUser.html',{'title':'create user page'},context_instance=RequestContext(request))
+    return render_to_response('main/Register.html',{'title':'create user page'},context_instance=RequestContext(request))
 
 
     
