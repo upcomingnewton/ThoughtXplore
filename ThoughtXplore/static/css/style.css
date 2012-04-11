@@ -161,10 +161,10 @@ h1 {
 
 }
 #page1 .slider {height:494px;}
-#page2 .slider {background:url(../images/slider3.jpg) 0 -171px no-repeat;}
-#page3 .slider {background:url(../images/director.jpg) 0 -154px no-repeat;}
-#page4 .slider{background:url(../images/campus1.jpg) 0 -154px no-repeat;},
-#page5 .slider {background:url(../images/TPO.jpg) 0 -200px no-repeat;}
+#page2 .slider {background:url(../images/slider3.jpg) 0 -154px no-repeat;}
+#page3 .slider {background:url(../images/director.jpg) 0 -80px no-repeat;}
+#page4 .slider {background:url(../images/campus1.jpg) 0 -154px no-repeat;}
+#page5 .slider {background:url(../images/tpo.jpg) 0 -154px no-repeat;}
 .items {
 	display:none;
 	
