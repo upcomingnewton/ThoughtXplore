@@ -128,6 +128,8 @@ def send_notice(details):
     '''
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
     message=dumps(details['message']).encode("zip").encode("base64").strip()
+    subject=dumps(subject).encode("zip").encode("base64").strip()
+
     param = {
            'FromUserID':fromUserID,
            'Subject':subject,

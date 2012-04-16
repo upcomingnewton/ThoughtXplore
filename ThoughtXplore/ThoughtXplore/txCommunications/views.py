@@ -21,6 +21,8 @@ def iframeNotice(request,ref):
         message= i.Message
         time=i.DateTimeSent
     message=loads(message.decode("base64").decode("zip"))
+    
+    subject=loads(subject.decode("base64").decode("zip"))
 
     return render_to_response('main/txCommunications/notice_iframe.html',{'Subject':subject,'message':message, 'time':time},context_instance=RequestContext(request))
 
@@ -45,7 +47,8 @@ def Index_viewnotices(request, token, ref):
             d2 = time.strptime(a,'%Y-%m-%d %H:%M:%S.%f')
             i.ParameterDict=d2.tm_mday
             i.TemplateID_id=decode_month(d2.tm_mon)
-            
+            i.Message=loads(i.Message.decode("base64").decode("zip"))
+            i.Subject=loads(i.Subject.decode("base64").decode("zip"))
             print i.ParameterDict
         Com=[]
         for i in reversed(Comm):
