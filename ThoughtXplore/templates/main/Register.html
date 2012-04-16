@@ -16,7 +16,8 @@
     <script src="{{STATIC_URL}}js/FF-cash.js" type="text/javascript"></script>     
     <script src="{{STATIC_URL}}js/easyTooltip.js" type="text/javascript"></script> 
     <script src="{{STATIC_URL}}js/script.js" type="text/javascript"></script>
-	<!--[if lt IE 7]>
+	<script src="{{STATIC_URL}}js/Validation.js" type="text/javascript"></script>
+		<!--[if lt IE 7]>
     <div style=' clear: both; text-align:center; position: relative;'>
         <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
         	<img src="{{STATIC_URL}}http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." />
@@ -80,21 +81,30 @@
 			{% csrf_token %}                            
 			<fieldset>
 
-                                  <label><span class="text-form">Your Email:</span><input type="text"  name="RegisterUser_email"></label>      
-                                  <label><span class="text-form">Your Password:</span><input type="password" name="RegisterUser_pass"></label>
-                                  <label><span class="text-form">Again:</span><input type="password" name="RegisterUser_pass2"></label>      
-                                  <label><span class="text-form">First Name:</span><input type="text" name="RegisterUser_fname"></label>
-                                  <label><span class="text-form">Middle Name:</span><input type="text" name="RegisterUser_mname"></label>      
-                                  <label><span class="text-form">Last Name:</span><input type="text" name="RegisterUser_lname"></label>          
-                                  <label><span class="text-form">DOB(mm/dd/yyyy):</span><input type="text" value="01/01/1990" name="RegisterUser_dob"></label>                                          
-                                  <label><span class="text-form">Gender:</span>
+                                  <label><span class="text-form">Your Email:</span>
+								  		<input type="text"  name="RegisterUser_email" id="email" placeholder="Your email please" onblur="checkmail({'type':'email','min_':'6','max_':'50'})" />
+								  </label>      
+                                  <label><span class="text-form">Your Password:</span>
+								  		<input type="password" name="RegisterUser_pass" id="password" placeholder="Your Password" onblur="checkpass({'type':'password','min_':'5','max_':''})"></label>
+                                  <label><span class="text-form">Re-Enter Pass:</span>
+								  		<input type="password" name="RegisterUser_pass2" id="repassword" placeholder="Please renter your password" onblur="checkpass2({'type':'repassword','chkfrom':'password','min_':'','max_':''})"></label>      
+                                  <label><span class="text-form">First Name:</span>
+								  		<input type="text" name="RegisterUser_fname" id="fname" placeholder="Please enter your First name" onblur="checkname({'type':'fname','min_':'1','max_':''})"></label>
+                                  <label><span class="text-form">Middle Name:</span>
+								  		<input type="text" name="RegisterUser_mname" id="mname" placeholder="Please enter your Middle Name(not Compulsory)" onblur="checkname({'type':'mname','min_':'1','max_':''})"></label>      
+                                  <label><span class="text-form">Last Name:</span>
+								  		<input type="text" name="RegisterUser_lname" id="lname" placeholder="Please enter your Last name" onblur="checkname({'type':'lname','min_':'1','max_':''})"></label>          
+                                  <label><span class="text-form">DOB:</span>
+								  		<input type="text" id="date" name="RegisterUser_dob" placeholder="Please enter your Date Of Birth as mm/dd/yyyy" onBlur="checkdate(this.id)"></label>                                          
+                                     <label><span class="text-form">Gender:</span>
                                    <select name="RegisterUser_gender"  >
                              		<option value="-1">select</option>
 									<option value="M">male</option>
 									<option value="F">female</option>
                             		 </select>
                                   
-                                  </label>                                          
+                                  </label>    
+                                  
                                   <div class="wrapper">
 
                                     <div class="extra-wrap">
@@ -142,7 +152,7 @@
                                 <li><a href="about">About</a></li>
                                 <li><a href="http://bit.ly/uietbrochure">Placement Brochure</a></li>
                                 <li><a href="contacts">Contacts</a></li>
-
+                        		<li><a href="/comm/notice/view/4089/0">Notices</a></li>
                             </ul>
                         </div>
                     </article>

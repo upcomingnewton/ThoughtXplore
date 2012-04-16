@@ -102,5 +102,5 @@ def CreateUserFromSite(HttpRequest):
         a= '/message/' + encrypt.encrypt( str(result[2])) + '/'
         print a
         return redirect(str(a))
-
+        
 

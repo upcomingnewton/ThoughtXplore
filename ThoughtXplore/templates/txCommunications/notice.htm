@@ -5,24 +5,13 @@
 
 </head>
 <body>
-<p>Folder List</p>
-<hr>
-{% for item in Folders %}
-<p>{{ item.name}}</p>
-{% endfor %}
 
-<table>
-<th>User-IDs</th>
-{% for item in Users %}
-	<tr>
-	<td>{{item.id}}-</td><td>{{item.UserFirstName}} {{item.UserLastName}}</td>
-	</tr>
-{% endfor %}
 
-</table>
+
 
 <h4>Send a Notice</h4>
 <form action="/comm/notice/send/" method="POST">
+{% csrf_token %}
 <hr>
 <p>From User:
 <select name="fromUserID_" id=""fromUserID"" title="From User">

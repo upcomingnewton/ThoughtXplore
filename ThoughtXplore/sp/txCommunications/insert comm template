@@ -8,7 +8,7 @@ DECLARE
     varrec RECORD;
     varrec1 RECORD;
 	by_user TEXT;
-	
+	comm_temp_id INTEGER;
 BEGIN 
 temp:=0;
 /*  1. check if Communication template exists or not    IF exists rs=602  */
@@ -44,11 +44,12 @@ END IF;
 SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
 --RAISE NOTICE 'INSERT USER, id IS %',in_userid;
 
+SELECT "id" into comm_temp_id FROM "txCommunications_communication_templates" WHERE "TemplateName"=TemplateName;
 
 
 /* 4. MAKE A LOG ENTRY */
 INSERT INTO "txCommunications_communicationlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
-						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+						VALUES(varrec.userid,varrec.varpci,comm_temp_id,now(),ip,'NULL','NULL');
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 

@@ -130,7 +130,8 @@ INSTALLED_APPS = (
     'txUser',
     'txFileSystem',
     'txCommunications',
-    'txMenu'
+    'txMenu',
+    'mailer'
 )
 
 # A sample logging configuration. The only tangible logging

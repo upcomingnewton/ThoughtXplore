@@ -17,7 +17,7 @@ class Communications(models.Model):
     Commtype_id=models.ForeignKey(Communication_Type)
     FromUserID=models.ForeignKey(User)
     TemplateID=models.ForeignKey(Communication_Templates)
-    Subject=models.CharField(max_length=100)
+    Subject=models.TextField()
     ParameterDict=models.TextField()
     DateTimeSent=models.TextField()
     Message=models.TextField()
@@ -26,7 +26,7 @@ class Communications(models.Model):
 class Communication_Groups(models.Model):
     Commtype_id=models.ForeignKey(Communication_Type)
     comm_id=models.ForeignKey(Communications)
-    Groups= models.ForeignKey(Group)
+    Groups= models.TextField()
 
 class Message_Replies(models.Model):
     Commtype_id=models.ForeignKey(Communication_Type)

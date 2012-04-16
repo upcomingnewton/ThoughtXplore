@@ -11,6 +11,7 @@ DECLARE
     varrec1 RECORD;
     email TEXT;
 	by_user TEXT;
+	commtype_id INTEGER;
 BEGIN 
 temp:=0;
 /*  1. check if communication_type exists or not IF doesnt exists rs=603  */
@@ -48,9 +49,11 @@ SELECT "UserEmail" into email from "txUser_user" WHERE "id"=cuser;
 SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=by_user;
 --RAISE NOTICE 'INSERT EMAIL TYPE, id IS %',in_userid;
 
+SELECT id INTO commtype_id FROM "txCommunications_communication_type" WHERE "type"=type_;
+
 /* 4. MAKE A LOG ENTRY */
 INSERT INTO "txCommunications_communicationlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
-						VALUES(varrec.userid,varrec.varpci,in_userid,now(),ip,'NULL','NULL');
+						VALUES(varrec.userid,varrec.varpci,commtype_id,now(),ip,'NULL','NULL');
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 

@@ -3,16 +3,15 @@ from ThoughtXplore.txCommunications.models import Communication_Templates, Commu
 from cPickle import dumps, loads
 import string
 from ThoughtXplore.txMisc.enc_dec import Encrypt
-from django.core.mail import send_mail
+from django.core import mail
+from mailer import send_mail
 from ThoughtXplore.txCommunications.DatabaseFunctions import DBInsertComm, DBInsertCommTemplate
 from datetime import datetime
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpRequest,HttpResponse
 from ThoughtXplore.txMisc.MiscFunctions import split
 from ThoughtXplore import CONFIG
 from ThoughtXplore.txUser.UserFunctions import UserFnx
 import time
-
 
 
 def send_validation_email(email,userid,fname,ip):
@@ -55,32 +54,80 @@ def send_validation_email(email,userid,fname,ip):
     print userlist
     
     print "till here too"
-    send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
-    print "email sent with message as"
-    print message
+    try:
+        
+        mail.send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
+    except:
+        send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
+    
+     
+    
     result= userfnx.AddUserToSecGroupForComm(group_id, userlist, 1, ip)
-    print result
+    #print result
     return result
 
-def send_notice(HttpRequest):
-    fromUserID= HttpRequest.POST["fromUserID_"]
+
+def send_notice(details):
+    
+    print "here"
+    
+    ip= details['ip']
+    #toGroupID=0 means to all groups
+    '''
+    if "details"  in  HttpRequest.sessions.keys():
+        session_data=HttpRequest.session['details']
+        fromUserID= session_data["userid"]
+    else:
+        return HttpResponse("UNAUTHORIZED ACCESS")
+    '''
+    
+    fromUserID=details["fromUserID"]
+    for i in UserGroup.objects.filter(User=fromUserID):
+        print i.id
+        print "lol"
+        print i.Group_id
+        print "lol"
+        if not(i.Group_id==3):
+            return HttpResponse("UNAUTHORIZED ACCESS")
+            #return
+        
+    print details
+    print "till here"
     for i in Communication_Type.objects.filter(type="notice"):
         CommTypeID=i.id
+    
+    if not Communication_Templates.objects.filter(TemplateName="Default").exists():
+        paramList_=  dumps(" ").encode("zip").encode("base64").strip()
+        TemplateFormat_=dumps(" ").encode("zip").encode("base64").strip()
+    
+        detail={
+                     'CommType':CommTypeID,
+                     'TemplateName':'Default',
+                     'paramList':paramList_,
+                     'TemplateFormat': TemplateFormat_,
+                     'Author':fromUserID,
+                     'ip':ip,
+                     }
+        DBInsertCommTemplate(detail)
+    print "here 1"
     for i in Communication_Templates.objects.filter(TemplateName="Default"):
-        TemplateID=i.id
-    subject= HttpRequest.POST["Subject_"]
-    togroupIDs= HttpRequest.POST["ToGroupIDs_"]
+        TemplateID=i.id  
+        
+    subject= details["subject"]
+    #togroupIDs= details("ToGroupIDs_")
     paramList= ""
+    '''
     if(togroupIDs!=""):
         a=split(togroupIDs)
         togroupIDs_=[int(i) for i in a]
-        
-    to_group_list=""
+    '''    
+    to_group_list="0"
+    '''
     for i in togroupIDs_:
         to_group_list+=str(i)+","
-    
+    '''
     paramList=dumps(paramList).encode("zip").encode("base64").strip()
-
+    message=dumps(details['message']).encode("zip").encode("base64").strip()
     param = {
            'FromUserID':fromUserID,
            'Subject':subject,
@@ -88,16 +135,16 @@ def send_notice(HttpRequest):
            'TemplateID':str(TemplateID),
            'ParameterDict':paramList,
            'ToGroupIDs':to_group_list,
-           'ip':HttpRequest.META['REMOTE_ADDR'],
+           'ip':ip,
            'comm_code_name': 'General Notice',
-           'Message':HttpRequest.POST['message'],
+           'Message':message,
            'TimeStamp':datetime.now(),
 
             }
     print param
-    DBInsertComm(param)
+    result=DBInsertComm(param)
     
-    HttpResponse("Done")
+    return result
 
 
 def addtemplate(HttpRequest):

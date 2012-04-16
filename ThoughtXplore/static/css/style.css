@@ -80,7 +80,7 @@ p {margin-bottom:18px;}
 .indent-bot3 {margin-bottom:45px;}
 
 .prev-indent-bot {margin-bottom:10px;}
-.prev-indent-bot2 {margin-bottom:12px;}
+.prev-indent-bot2 {margin-bottom:12px; }
 .prev-indent-bot3 {margin-bottom:5px;}
 .img-indent-bot {margin-bottom:25px;}
 .margin-bot {margin-bottom:35px;}
@@ -112,7 +112,7 @@ h1 {
 	position:relative;
 	float:left;
 }
-#page1 h1 {padding:77px 0 0 10px; }
+#page1 h1 {padding:77px 0 0 0px; }
 	h1 a {
 		display:block; 
 		width:340px;

@@ -1,157 +1,124 @@
 // JavaScript Document
-var check_type = [
-{ "type":"email" , "min_":"10" , "max_":"50" },
-{ "type":"rollno" , "min_":"4" , "max_":"7" },
-{ "type":"name" , "min_":"4" , "max_":"" },
-{ "type":"pass" , "min_":"10" , "max_":"" }
-]
-
-function checkmail(elem_id,error_id)
+function checkmail(check_ob)
 {
-	
+	var elem_id = check_ob.type;
 	var val=document.getElementById(elem_id);
-	
-	for(i=0;i<4;i++){
-		if(elem_id==check_type[i].type){
-			id_no=i;
-			break;
-		}
-	}
-	
-	if(chk_email(val) == true){
-		if(max_length(val, i) == true){
-			var image='<img src="Tick.png" alt="Tick" height="23" width="23" />';
-			error_id.innerHTML=image;
+
+	if(txValidateEmail(val) == true){
+		if(txValidateMaxLength(val, parseInt(check_ob.max_)) == true){
 			return true;
 		}
 		else{
-			var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-			error_id.innerHTML=image;
 			val.value='';
-			val.placeholder='Valid Email Address Please..!';
+			val.placeholder='Too long, Not a Valid Email Address..!';
 			return false;
 		}
 		
 	}
-	else if(empty(val)==true)
+	else if(txValidateEmpty(val)==true)
 	{
-		var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-		error_id.innerHTML=image;
 		val.value='';
 		val.placeholder='Email Address Please..!';
 		return false;
 	}
 	else
 	{
-		var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-		error_id.innerHTML=image;
 		val.value='';
 		val.placeholder='Valid Email Address Please..!';
 		return false;
 	}
 }
 
-function checkname(elem_id,error_id)
+function checkname(check_ob,error_id)
 {
-	
+	var elem_id = check_ob.type;
 	var val=document.getElementById(elem_id);
+
 	
-	for(i=0;i<4;i++){
-		if(elem_id==check_type[i].type){
-			id_no=i;
-			break;
-		}
-	}
-	
-	if(name(val) == true){
-		if(min_length(val, i) == true){
-			var image='<img src="Tick.png" alt="Tick" height="23" width="23" />';
-			error_id.innerHTML=image;
+	if(txValidateAlphabet(val) == true){
+		if(txValidateMinLength(val, parseInt(check_ob.min_)) == true){
 			return true;
 		}
 		else{
-			var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-			error_id.innerHTML=image;
 			val.value='';
-			val.placeholder='Valid Name Please..!';
+			val.placeholder='Name Too Short..!';
 			return false;
 		}
 		
 	}
-	else if(empty(val)==true)
+	else if(txValidateEmpty(val)==true)
 	{
-		var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-		error_id.innerHTML=image;
-		val.value='';
-		val.placeholder='Name Please..!';
-		return false;
+		if(elem_id == 'mname'){
+			return true;
+		}
+		else{
+			val.value='';		
+			val.placeholder='Name Please..!';
+			return false;
+		}
 	}
 	else
 	{
-		var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-		error_id.innerHTML=image;
 		val.value='';
 		val.placeholder='Valid Name Please..!';
 		return false;
 	}
 }
 
-function checkrollno(elem_id,error_id)
+function checkpass(check_ob)
 {
-	
+	var elem_id = check_ob.type;
 	var val=document.getElementById(elem_id);
+
 	
-	for(i=0;i<4;i++){
-		if(elem_id==check_type[i].type){
-			id_no=i;
-			break;
-		}
-	}
-	
-	if(numeric(val) == true){
-		if(min_length(val, i) == true){
-			if(max_length(val,i) == true){
-				var image='<img src="Tick.png" alt="Tick" height="23" width="23" />';
-				error_id.innerHTML=image;
-				return true;
-			}
-			else{
-				var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-				error_id.innerHTML=image;
-				val.value='';
-				val.placeholder='Valid Roll Number Please..!';
-				return false;
-			}
-		}
-		else{
-			var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-			error_id.innerHTML=image;
-			val.value='';
-			val.placeholder='Valid Roll Number Please..!';
-			return false;
-		}
-		
-	}
-	else if(empty(val)==true)
+	if(txValidateEmpty(val)==true)
 	{
-		var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-		error_id.innerHTML=image;
 		val.value='';
-		val.placeholder='Roll Number Please..!';
+		val.placeholder='Please Enter Password..!';
 		return false;
 	}
 	else
 	{
-		var image='<img src="Cross.png" alt="Cross" height="23" width="23" />';
-		error_id.innerHTML=image;
+		if(txValidateMinLength(val, parseInt(check_ob.min_)) == true){
+			return true;
+			}
+		else{
+			val.value='';
+			val.placeholder='Password too short..!';
+			return false;
+		}
+	}
+
+}
+function checkpass2(check_ob){
+	var elem_id = check_ob.type;
+	var checkpass_id = check_ob.chkfrom;
+	var val=document.getElementById(elem_id);
+	var val_chk=document.getElementById(checkpass_id);
+	if(val.value == val_chk.value){
+		return true;
+	}
+	else{
 		val.value='';
-		val.placeholder='Valid Roll Number Please..!';
+		val.placeholder='Passwords do not match..!';
 		return false;
 	}
 }
 
+function checkdate(elem_id){
+	var date = document.getElementById(elem_id).value;
+	var val = document.getElementById(elem_id);
+	if(txValidateDate(date) == true){
+		return true;
+	}
+	else{
+		val.value='';
+		val.placeholder='Date invalid..! Please enter your Date Of Birth as mm/dd/yyyy';
+		return false;
+	}
+}
 //All of the generic functions here:
-function chk_email(val)
+function txValidateEmail(val)
 {
 	var chk_exp= /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
 	
@@ -164,9 +131,9 @@ function chk_email(val)
 		return false;
 	}
 }
-function min_length(val,i)
+function txValidateMinLength(val,i)
 {
-	if(val.value.length > parseInt(check_type[i].min_))
+	if(val.value.length > i)
 	{
 		return true;
 	}
@@ -176,9 +143,9 @@ function min_length(val,i)
 	}
 }
 
-function max_length(val,i)
+function txValidateMaxLength(val,i)
 {
-	if(val.value.length < parseInt(check_type[i].max_))
+	if(val.value.length < i)
 	{
 		return true;
 	}
@@ -187,7 +154,7 @@ function max_length(val,i)
 		return false;
 	}
 }
-function empty(val)
+function txValidateEmpty(val)
 {
 	if(val.value.length == 0){
 		return true;
@@ -196,7 +163,7 @@ function empty(val)
 		return false;
 	}
 }
-function numeric(val)
+function txValidateNumber(val)
 {
 	var chk_exp =  /^[0-9]+$/;
 	if(val.value.match(chk_exp))
@@ -208,7 +175,7 @@ function numeric(val)
 		return false;
 	}
 }
-function alphabets(val)
+function txValidateAlphabet(val)
 {
 	var chk_exp= /^[a-zA-Z]+$/;
 	if(val.value.match(chk_exp))
@@ -220,7 +187,7 @@ function alphabets(val)
 		return false;
 	}
 }
-function alpha_numeric(val)
+function txValidateAlphaNumeric(val)
 {
 	var chk_exp=/^[0-9a-zA-Z]+$/;
 	if(val.value.match(chk_exp))
@@ -232,7 +199,7 @@ function alpha_numeric(val)
 		return false;
 	}
 }
-function name(val){
+function txValidateName(val){
 	var chk_exp=/^[/ a-zA-Z]+$/;
 	if(val.value.match(chk_exp))
 	{
@@ -242,4 +209,43 @@ function name(val){
 	{
 		return false;
 	}
+}
+function txValidateDate(txtDate) {
+    var objDate,  // date object initialized from the txtDate string
+        mSeconds, // txtDate in milliseconds
+        day,      // day
+        month,    // month
+        year;     // year
+    // date length should be 10 characters (no more no less)
+    if (txtDate.length !== 10) {
+        return false;
+    }
+    // third and sixth character should be '/'
+    if (txtDate.substring(2, 3) !== '/' || txtDate.substring(5, 6) !== '/') {
+        return false;
+    }
+    // extract month, day and year from the txtDate (expected format is mm/dd/yyyy)
+    // subtraction will cast variables to integer implicitly (needed
+    // for !== comparing)
+    month = txtDate.substring(0, 2) - 1; // because months in JS start from 0
+    day = txtDate.substring(3, 5) - 0;
+    year = txtDate.substring(6, 10) - 0;
+    // test year range
+    if (year < 1000 || year > 3000) {
+        return false;
+    }
+    // convert txtDate to milliseconds
+    mSeconds = (new Date(year, month, day)).getTime();
+    // initialize Date() object from calculated milliseconds
+    objDate = new Date();
+    objDate.setTime(mSeconds);
+    // compare input date and parts from Date() object
+    // if difference exists then date isn't valid
+    if (objDate.getFullYear() !== year ||
+        objDate.getMonth() !== month ||
+        objDate.getDate() !== day) {
+        return false;
+    }
+    // otherwise return true
+    return true;
 }
