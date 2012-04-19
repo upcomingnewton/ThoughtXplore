@@ -23,7 +23,7 @@ def AuthenticateUserFromEmail(HttpRequest,token,refs):
         print result
         if( result[0] >= 1 ):
             encrypt = Encrypt()
-            return redirect('/message/' + encrypt.encrypt( str(result[1])) + '/')
+            return redirect('/user/message/' + encrypt.encrypt( str(result[1])) + '/')
 
     except:
         return HttpResponse("error")
@@ -99,7 +99,7 @@ def CreateUserFromSite(HttpRequest):
         print result[2]
         print "this"
         encrypt = Encrypt()
-        a= '/message/' + encrypt.encrypt( str(result[2])) + '/'
+        a= '/user/message/' + encrypt.encrypt( str(result[2])) + '/'
         print a
         return redirect(str(a))
         

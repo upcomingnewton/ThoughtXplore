@@ -28,11 +28,7 @@ class Communication_Groups(models.Model):
     comm_id=models.ForeignKey(Communications)
     Groups= models.TextField()
 
-class Message_Replies(models.Model):
-    Commtype_id=models.ForeignKey(Communication_Type)
-    FromUserID=models.ForeignKey(User)
-    reply= models.TextField()
-    SCI= models.ForeignKey(StateContentType)
+
 
 class CommunicationLogs(models.Model):
     

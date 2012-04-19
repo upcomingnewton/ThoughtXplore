@@ -20,10 +20,12 @@ def DBLoginUser(logindetails):
     print DBhelper.CallFunction(query)
     
 def DBAuthenicateUser(auth_details):
-    query = "SELECT * FROM txUser_user_authenicate('" + auth_details['to_email'] + "','" + auth_details['by_email'] + "','" + auth_details['ip'] + "','" + auth_details['type'] + "');"
+    #"SELECT * FROM txUser_user_statechange('" + auth_details['to_email'] + "','" + auth_details['by_email'] + "','" + auth_details['state'] + "','" + auth_details['perm'] + "','" + auth_details['ip'] + "','" + auth_details['logsdesc'] + "');"
+    query = "SELECT * FROM txUser_user_statechange('" + auth_details['to_email'] + "','" + auth_details['by_email'] + "','" + auth_details['state'] + "','" + auth_details['perm'] + "','" + auth_details['ip'] + "','" + auth_details['logsdesc'] + "');"
     print query
     result =  DBhelper.CallFunction(query)
-    return result
+    print result
+    return result[0]
 
 def DBCreateGroup(details):
     query = "SELECT * FROM txUser_group_insert('" + details['name'] + "','" + details['desc'] + "','" + details['type'] + "','" + details['entity'] + "','" + details['permission'] + "','" + details['by'] + "','" + details['ip'] + "');"

@@ -17,7 +17,9 @@ class UserFnx(models.Model):
         s = to_emailid.split('___')
         print s
         print to_emailid
+        print "hi"
         result = DBAuthenicateUser({'to_email':s[0],'by_email':'2','state':'AUTHENTICATED','perm':'USER_AU','ip':ip,'logsdesc':'USER_AU'})
+        print result[0]
         return( int(result[0]),decode(int(result[0]),result[1],'AuthenticateUserFromSite'))
         
     def InsertUserFromSite(self,email,password,fname,mname,lname,gender,bday,entity,ip):

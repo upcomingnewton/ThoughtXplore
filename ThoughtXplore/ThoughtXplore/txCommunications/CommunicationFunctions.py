@@ -1,10 +1,14 @@
 from ThoughtXplore.txUser.models import User, UserGroup, Group
+
+
+
 from ThoughtXplore.txCommunications.models import Communication_Templates, Communication_Type,Communication_Groups
 from cPickle import dumps, loads
 import string
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 from django.core import mail
 from mailer import send_mail
+from ThoughtXplore.txMisc.Email import sendMail
 from ThoughtXplore.txCommunications.DatabaseFunctions import DBInsertComm, DBInsertCommTemplate
 from datetime import datetime
 from django.http import HttpRequest,HttpResponse
@@ -54,13 +58,12 @@ def send_validation_email(email,userid,fname,ip):
     print userlist
     
     print "till here too"
-    try:
+    #try:
         
-        mail.send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
-    except:
-        send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
-    
-     
+        #mail.send_mail(Subject, message,"AuthenticateUserDaemon@tx.com", [email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"], fail_silently=True)
+    #except:
+    sendMail([email,"sarvpriye98@gmail.com", "upcomingnewton@gmail.com"],"no-reply@thoughtxplore.com",Subject,message)
+    print message 
     
     result= userfnx.AddUserToSecGroupForComm(group_id, userlist, 1, ip)
     #print result
@@ -89,7 +92,6 @@ def send_notice(details):
         print "lol"
         if not(i.Group_id==3):
             return HttpResponse("UNAUTHORIZED ACCESS")
-            #return
         
     print details
     print "till here"
@@ -130,6 +132,8 @@ def send_notice(details):
     message=dumps(details['message']).encode("zip").encode("base64").strip()
     subject=dumps(subject).encode("zip").encode("base64").strip()
 
+
+    
     param = {
            'FromUserID':fromUserID,
            'Subject':subject,
@@ -144,6 +148,9 @@ def send_notice(details):
 
             }
     print param
+    
+    
+    
     result=DBInsertComm(param)
     
     return result

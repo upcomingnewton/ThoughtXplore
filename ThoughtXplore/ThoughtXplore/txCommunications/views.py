@@ -11,7 +11,10 @@ from ThoughtXplore.txCommunications.CommunicationFunctions import send_mails
 from django.contrib import sessions
 from ThoughtXplore.txMisc.enc_dec import Encrypt
 import time
-from ThoughtXplore.txMisc.MiscFunctions import decode_month
+from time import mktime
+from datetime import datetime
+from ThoughtXplore.txMisc.MiscFunctions import decode_month 
+from ThoughtXplore.txCommunications.DatabaseFunctions import DBInsertCommTemplate
 def iframeNotice(request,ref):
     
     c=Communications.objects.filter(id=ref)
@@ -20,6 +23,7 @@ def iframeNotice(request,ref):
         
         message= i.Message
         time=i.DateTimeSent
+        
     message=loads(message.decode("base64").decode("zip"))
     
     subject=loads(subject.decode("base64").decode("zip"))
@@ -27,6 +31,7 @@ def iframeNotice(request,ref):
     return render_to_response('main/txCommunications/notice_iframe.html',{'Subject':subject,'message':message, 'time':time},context_instance=RequestContext(request))
 
 def Index_viewnotices(request, token, ref):
+    
     
     try:
         if token=="4089":
@@ -39,14 +44,27 @@ def Index_viewnotices(request, token, ref):
             ct_id=i.id
         print ct_id
         Comm= Communications.objects.filter(Commtype_id=ct_id)
-        d={'day':0, 'month':'Jan'}
         
-        
+        print "here"
         for i in Comm:
             a=i.DateTimeSent
             d2 = time.strptime(a,'%Y-%m-%d %H:%M:%S.%f')
-            i.ParameterDict=d2.tm_mday
-            i.TemplateID_id=decode_month(d2.tm_mon)
+
+            d3={'day':d2.tm_mday,
+                'month':decode_month(d2.tm_mon),
+                'year':d2.tm_year
+                }       
+            print d2
+            dt = datetime.fromtimestamp(mktime(d2))
+            print dt
+            
+                        
+            #time_string=d2
+            #d3= time.strftime(d2, "%Y %B %d %H %M %S")
+            #print d2
+            i.DateTimeSent=d3
+            #i.ParameterDict=d2.tm_mday
+            #i.TemplateID_id=decode_month(d2.tm_mon)
             i.Message=loads(i.Message.decode("base64").decode("zip"))
             i.Subject=loads(i.Subject.decode("base64").decode("zip"))
             print i.ParameterDict
@@ -116,7 +134,7 @@ def sendnotice(HttpRequest):
     else:
         message="The Notice was not posted due to an error"
     encrypt = Encrypt()
-    a= '/message/' + encrypt.encrypt( message) + '/'
+    a= '/user/message/' + encrypt.encrypt( message) + '/'
     return redirect(str(a))
     
 
@@ -147,6 +165,32 @@ def Indexemail(request):
         return HttpResponse("error")
     
     
+def addtemplate(HttpRequest):
+    authorID= int(HttpRequest.POST["authorID"])
+    CommType=Communication_Type.objects.filter(type="email")
+    for i in CommType:
+        CommTypeID=i.id
+    print CommTypeID
+    TemplateName= HttpRequest.POST["TemplateName"]
+    paramList= HttpRequest.POST["paramList"]
+    TemplateFormat= HttpRequest.POST["TemplateFormat"]
+    paramList_=  dumps(paramList).encode("zip").encode("base64").strip()
+    TemplateFormat_=dumps(TemplateFormat).encode("zip").encode("base64").strip()
+    template= Communication_Templates()
+    ip=HttpRequest.META['REMOTE_ADDR']
+    print "test"
+    details={
+             'CommType':CommTypeID,
+             'TemplateName':TemplateName,
+             'paramList':paramList_,
+             'TemplateFormat':TemplateFormat_,
+             'Author':authorID,
+             'ip':HttpRequest.META['REMOTE_ADDR'],
+             }
+    DBInsertCommTemplate(details)
+    
+    return HttpResponse("Done")
+
 def sendemail(HttpRequest):
     try:
         fromUserID= HttpRequest.POST["fromUserID_"]
