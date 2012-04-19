@@ -30,7 +30,7 @@ def send_validation_email(email,userid,fname,ip):
     encdec=Encrypt()
     token=encdec.encrypt(str(userid) + '___' + email)
     refs = int(time.time())
-    token="http://127.0.0.1:8000/user/authenticate/email/"+token+"/" + str(refs) + "/"
+    token="http://uiet.thoughtxplore.com/user/authenticate/email/"+token+"/" + str(refs) + "/"
     #token="http://uiet.thoughtexplore.com/user/authenticate/email/"+token+"/"
     
     param_list_=[fname]    
