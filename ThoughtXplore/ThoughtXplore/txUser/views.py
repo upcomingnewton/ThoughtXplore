@@ -83,8 +83,8 @@ def CreateUserFromSite(HttpRequest):
     bday = bday.split('/')
     try:
         bday = datetime.date(int(bday[2]),int(bday[0]),int(bday[1]))
-    except ValueError as err:
-        errorlist.append('Invalid Birthdate, '+ err.message)
+    except:
+        errorlist.append('Invalid Birthdate, Enter as mm/dd/yyyy ')
     gender = HttpRequest.POST['RegisterUser_gender']
     if gender== "-1" :
         errorlist.append('Please select your gender')
