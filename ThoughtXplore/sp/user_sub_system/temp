@@ -5,10 +5,16 @@ SELECT * FROM
 SELECT * FROM txUser_user_insert('testuser@test.com','testpass','fname_test','mname_test','lname_test','f',current_date,'system','INSERT','created_users','state=;group=;',1,'test');
 SELECT * FROM txUser_user_edit(4,'testuser@test.com','testpass','fname_changed','mname_changed','lname_changed','m',current_date,1,4,1,'test_changed','test_logsdesc','test_logsprev');
 SELECT * FROM user_login('testuser@test.com','testpass','ADMIN-SITE','test');
-SELECT * FROM txUser_user_statechange('4',1,'ACTIVE','ADMIN_AU','test','changing state for login');
+SELECT * FROM txUser_user_statechange('4',1,1,'ACTIVE','ADMIN_AU','test','changing state for login');
 SELECT * FROM txUser_group_insert('Group_Comm_EmailValidation','This group contans all people who have been sent email for validation',3,'system','INSERT',1,'test');
-SELECT * FROM SecGroup_Comm_insert(4,'INSERT','{"id":"txUser_user"}','-1','Validation Email Group Users',1,'test');
-SELECT * FROM SecGroup_Comm_appned(4,'2,3,-1','{"id":"txUser_user"}','UPDATE',1,'test','logsdesc','prevstate');
+SELECT * FROM  SecGroup_Comm_insert(4,'INSERT','{"id":"txUser_user"}','[-1]','Validation Email Group Users',1,'test');
+SELECT * FROM SecGroup_Comm_appned(4,'2,3,5,-1','{"id":"txUser_user"}','UPDATE',1);
+SELECT * FROM txUser_group_insert('test_test','test',1,'2,3,4,5',4,'2,3,4,5','system','INSERT',1,'test');
 
+SELECT * FROM txUser_group_insert('test_test1','test1',1,'system','INSERT',1,'test');
+SELECT * FROM txUser_group_insert('test_test2','test2',1,'system','INSERT',1,'test');
+SELECT * FROM txUser_group_insert('test_test3','test3',1,'system','INSERT',1,'test');
+SELECT * FROM txUser_group_insert('test_test4','test4',1,'system','INSERT',1,'test');
 
-
+SELECT * FROM user_logout(1,1,logout time);
+ 

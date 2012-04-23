@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION user_login
 	password VARCHAR,
 	login_type VARCHAR,
 	ip VARCHAR,
+	time_stamp timestamp with time zone,
 	OUT userid INTEGER,
 	OUT user_status INTEGER,
 	OUT loginid INTEGER,
@@ -18,9 +19,8 @@ DECLARE
 	varrec1 RECORD;
 	login_type_int INTEGER;
 	temp INTEGER;
-	--tmp TIMESTAMP WITH TIME ZONE DEFAULT now();
 BEGIN 
---RAISE TIME 'time now is %',tmp;
+
 IF NOT EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=emailid ) THEN
 	result := -1;
 	rescode = 651;
@@ -44,14 +44,8 @@ END IF;
 SELECT id INTO user__id FROM "txUser_user" WHERE "UserEmail"=emailid;
 SELECT * INTO varrec FROM  checkstatus('txUser_user','ACTIVE',user__id);
 user_status := varrec.scid;
-IF varrec.result < 0 THEN 
-	rescode := varrec.result;
-	result := -6;
-	userid := user__id;	
-	loginid := -1;
-	SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
-	RETURN;
-END IF;
+SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
+
 
 SELECT id INTO login_type_int FROM "txUser_logintype" WHERE "LoginTypeName"=login_type;
 IF login_type_int IS NULL THEN 
@@ -74,8 +68,8 @@ IF varrec1.result < 0 THEN
 	RETURN;
 END IF;
 
-INSERT INTO "txUser_userloginlog"(user_id,"Login_From_id","LoginTime","LoginIP","LogoutTime")
-VALUES(user__id,login_type_int,now(),ip,now());
+INSERT INTO "txUser_userloginlog"(user_id,"Login_From_id","LoginTime","LoginIP","LogoutTime","Logout_From")
+VALUES(user__id,login_type_int,time_stamp,ip,now(),login_type_int);
 GET DIAGNOSTICS temp := ROW_COUNT;
 IF temp <> 1 THEN 
 	rescode := 654;
@@ -90,7 +84,7 @@ ELSE
 	result := 1;
 	user_status := varrec.scid;
 	userid := user__id;	
-	SELECT id INTO loginid FROM "txUser_userloginlog" WHERE user_id=user__id AND "LoginIP"=ip;
+	SELECT id INTO loginid FROM "txUser_userloginlog" WHERE user_id=user__id AND "LoginIP"=ip AND "LoginTime"=time_stamp;
 	SELECT "Group_id" INTO groupid FROM "txUser_usergroup" WHERE "User_id"=user__id;
 	RETURN;
 END IF;

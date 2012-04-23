@@ -4,9 +4,6 @@ user_details VARCHAR,
 params VARCHAR,
 request_perm VARCHAR,
 by_user INTEGER,
-ip VARCHAR,
-logsdesc VARCHAR,
-prevstate VARCHAR,
 OUT result INTEGER,
 OUT rescode INTEGER
 ) RETURNS RECORD AS $$
@@ -40,15 +37,6 @@ WHERE "Group_id"=groupid;
 GET DIAGNOSTICS temp := ROW_COUNT;
 IF temp <> 1 THEN 
 	rescode := 732;
-	result := -1;
-        RETURN;
-END IF;
-
-INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
-						VALUES(varrec.userid,varrec.varpci,groupid,now(),ip,logsdesc,prevstate);
-GET DIAGNOSTICS temp := ROW_COUNT;
-IF temp <> 1 THEN 
-	rescode := 733;
 	result := -1;
         RETURN;
 ELSE

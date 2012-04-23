@@ -4,6 +4,7 @@ from ThoughtXplore.txMisc.enc_dec import Encrypt
 from DatabaseFunctions import *
 from DBMessages import db_messages,decode
 from cPickle import dumps, loads
+from aux_fun import MakeGroupMenu
 
 class UserFnx(models.Model):
     
@@ -17,9 +18,7 @@ class UserFnx(models.Model):
         s = to_emailid.split('___')
         print s
         print to_emailid
-        print "hi"
         result = DBAuthenicateUser({'to_email':s[0],'by_email':'2','state':'AUTHENTICATED','perm':'USER_AU','ip':ip,'logsdesc':'USER_AU'})
-        print result[0]
         return( int(result[0]),decode(int(result[0]),result[1],'AuthenticateUserFromSite'))
         
     def InsertUserFromSite(self,email,password,fname,mname,lname,gender,bday,entity,ip):
@@ -48,7 +47,26 @@ class UserFnx(models.Model):
                        'login_type':_type,
                        'ip':ip}
                         
-        DBLoginUser(details)
+        result = DBLoginUser(details)
+        if( int(result[0]) >= 1):
+            MakeGroupMenu(result[1])
+            return (result)
+        else:
+            return (result[0],decode(int(result[0]), result[1],'LoginUser'))
+        
+        
+    def LogoutUser(self,loginid):
+        details = {'loginid':self.encrypt.decrypt(loginid),
+                   'logout_from':99,
+                  }
+                        
+        result = DBLogoutUser(details)
+        print result 
+        return result
+        #if( int(result[0]) >= 1):
+        #    return (result)
+        #else:
+        #    return (result[0],decode(int(result[0]), result[1],'LoginUser'))
         
     def CreateNewGroup(self,name,desc,type,entity,by,ip):
         details = {
@@ -98,4 +116,6 @@ class UserFnx(models.Model):
                     'ip':ip
                    }
         result = DBAddUsertoSecGroupForCommunications(details)
-        return (result[0],decode(int(result[0][0]), result[0][1],'AddUserToSecGroupForComm'))
+        return (result[0],decode(int(result[0]), result[1],'AddUserToSecGroupForComm'))
+    
+    

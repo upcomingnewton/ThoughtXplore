@@ -32,7 +32,7 @@ temp := 0;
 
 /*  1. check if user exists or not   */
 IF EXISTS ( SELECT id FROM "txUser_user" WHERE "UserEmail"=email) THEN
-    SELECT "SCI_id" INTO rescode  FROM "txUser_user" WHERE "UserEmail"=email;
+    SELECT id INTO rescode  FROM "txUser_user" WHERE "UserEmail"=email;
 	result := 2;
       --  ROLLBACK;
 	RETURN;
@@ -71,9 +71,8 @@ SELECT id INTO in_userid FROM "txUser_user" WHERE "UserEmail"=email;
 --RAISE NOTICE 'INSERT USER, id IS %',in_userid;
 
 
-INSERT INTO "txUser_usergroup"("User_id","Group_id","SCI_id") 
-			VALUES(in_userid,(SELECT id FROM "txUser_group" where "GroupName"=request_group ),varrec1.varsci);
---RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+INSERT INTO "txUser_usergroup"("User_id","Group_id","SCI_id") VALUES(in_userid,(SELECT id FROM "txUser_group" where "GroupName"=request_group ),varrec1.varsci);
+--RAISE NOTICE 'INSERT USERGROUP, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
 	rescode := 602;
 	result := -1;

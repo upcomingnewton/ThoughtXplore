@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION txUser_user_statechange(
 csv_userid VARCHAR,
+num_val 	INTEGER,
 by_user INTEGER,
 request_state VARCHAR,
 request_permission VARCHAR,
@@ -38,7 +39,7 @@ EXECUTE 'UPDATE "txUser_user" SET "SCI_id"=$1 WHERE id in (' || csv_userid || ')
 --SET "SCI_id" = varrec.varsci
 --WHERE id in csv_userid;
 GET DIAGNOSTICS temp := ROW_COUNT;
-IF temp <> 1 THEN 
+IF temp <> num_val THEN 
 	rescode :=  697;
 	result := -1;
 	RETURN;

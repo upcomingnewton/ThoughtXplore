@@ -68,3 +68,4 @@ class UserLoginLog(models.Model):
     Login_From = models.ForeignKey(LoginType)
     LogoutTime = models.DateTimeField()
     LoginIP = models.CharField(max_length=20)
+    Logout_From = models.IntegerField()

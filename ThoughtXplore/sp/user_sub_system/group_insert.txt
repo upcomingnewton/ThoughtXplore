@@ -13,17 +13,21 @@ DECLARE
     temp INTEGER;
     gid INTEGER;
     varrec RECORD;
+    x INTEGER;
+    num_menu INTEGER;
 BEGIN 
 temp := 0;
+x := 0;
+num_menu := 0;
 /*
-1. check if group exists or not 
+1. check if user exists or not 
 2. if does not exists , then check for all contraints 
 3. insert data
 4. check for inserted data
 5. insert logs , check for logs and commit
 */
 
-/*  1. check if group exists or not   */
+/*  1. check if user exists or not   */
 IF EXISTS ( SELECT id FROM "txUser_group" WHERE "GroupName"=group_name) THEN
     SELECT "SCI_id" INTO rescode  FROM "txUser_group" WHERE "GroupName"=group_name;
 	result := 2;
@@ -63,7 +67,7 @@ INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeS
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
-	rescode := -703;
+	rescode := 703;
 	result := -1;
       --  ROLLBACK;
         RETURN;

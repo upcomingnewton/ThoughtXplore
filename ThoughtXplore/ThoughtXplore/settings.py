@@ -1,3 +1,4 @@
+# Django settings for ThoughtXplore project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -11,9 +12,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'tpcuiet2013',                      # Or path to database file if using sqlite3.
-        'USER': 'tpcuiet2013',                      # Not used with sqlite3.
-        'PASSWORD': 'Nath@3728.com',                  # Not used with sqlite3.
+        'NAME': 'thoughtxplore',                      # Or path to database file if using sqlite3.
+        'USER': 'thoughtxplore',                      # Not used with sqlite3.
+        'PASSWORD': 'thoughtxplore',                  # Not used with sqlite3.
         'HOST': '0.0.0.0',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -35,8 +36,8 @@ LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'no-reply@thoughtexplore.com'
-EMAIL_HOST_PASSWORD = 'Nath@noreply'
+EMAIL_HOST_USER = 'thoughtxplore@gmail.com'
+EMAIL_HOST_PASSWORD = 'NewalaTX:)'
 EMAIL_PORT = 587
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -59,12 +60,12 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-
+STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_ROOT = ''
-STATIC_URL= '/static/'
+STATIC_URL = '/static/'
+
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
@@ -75,7 +76,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/var/www/vhosts/uiet/ThoughtXplore/ThoughtXplore/static',
+    '/home/nitin/git/ThoughtXplore/ThoughtXplore/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -102,6 +103,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ROOT_URLCONF = 'ThoughtXplore.urls'
@@ -110,12 +113,13 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/var/www/vhosts/uiet/ThoughtXplore/ThoughtXplore/templates"       
+    "/home/nitin/git/ThoughtXplore/ThoughtXplore/templates"
 )
+
 INSTALLED_APPS = (
     #'django.contrib.auth',
     'django.contrib.contenttypes',
-    #'django.contrib.sessions',
+    'django.contrib.sessions',
     #'django.contrib.sites',
     #'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -126,10 +130,8 @@ INSTALLED_APPS = (
     'txMisc',
     'txMiscLogs',
     'txUser',
-    'txFileSystem',
     'txCommunications',
-    'txMenu',
-    'django_mailer'
+    'txMenu'
 )
 
 # A sample logging configuration. The only tangible logging
@@ -154,3 +156,12 @@ LOGGING = {
         },
     }
 }
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11229',
+    }
+}
+SESSION_ENGINE="django.contrib.sessions.backends.cached_db"
