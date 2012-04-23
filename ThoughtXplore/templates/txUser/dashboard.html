@@ -1,0 +1,53 @@
+{% extends "master1.html" %}
+{% block title %}{{ title }}{% endblock%}
+{% block master_content_center %}
+	<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:15px;margin-bottom:4px;"></div>
+   <!--  =============================== -->
+   <!-- ====== ###### TITLE ######## === -->
+    <!--  =============================== -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:45px;margin-bottom:4px;">
+				<div style="font-size: 35px;">
+                           dashboard
+                </div>
+		</div>
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+		
+	<!--  =============================== -->
+   <!-- ====== ###### MESSAGE LIST ######## === -->
+    <!--  =============================== -->
+		{% if errorlist|length > 0 %}
+			{% for err in errorlist %}
+				<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+					<div style="color:red;">
+						{{ err }}
+					</div>
+                </div>
+			{% endfor %}
+		{% endif %}
+		
+		<!-- empty line  -->
+	<!--  =============================== -->
+   <!-- ====== ###### CONTENT ######## === -->
+    <!--  =============================== -->
+    <div>
+		<table id="hor-minimalist-a" class="tableclass">
+		    <thead>
+		    	<tr>
+		    		<th scope="col">USER ID</th>
+		        	<th scope="col">LOGIN ID</th>
+					<th scope="col">group ID</th>
+		        </tr>
+    		</thead>
+    	    <tbody>
+					<tr>
+						<td>{{ details["userid"] }}</td>
+						<td>{{ details["groupid"] }}</td>
+						<td>{{ details["loginid"] }}</td>
+				    </tr>
+		    </tbody>
+		</table>
+		</div>
+{% endblock %}
+

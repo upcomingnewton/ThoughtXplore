@@ -1,0 +1,83 @@
+{% extends "master2.html" %}
+    {% block title %}{{ title }}{% endblock %}
+    {% block add_start_script %}
+		<link type="text/css" href="{{STATIC_URL}}css/tables.css" rel="stylesheet" type="text/css" />
+	{% endblock %}
+	{% block master_content_center %}
+	<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:15px;margin-bottom:4px;"></div>
+   <!--  =============================== -->
+   <!-- ====== ###### TITLE ######## === -->
+    <!--  =============================== -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:45px;margin-bottom:4px;">
+				<div style="font-size: 35px;">
+                       Listing Groups
+                </div>
+		</div>
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+		
+	<!--  =============================== -->
+   <!-- ====== ###### MESSAGE LIST ######## === -->
+    <!--  =============================== -->
+		{% if msglist|length > 0 %}
+			{% for msg in msglist %}
+				<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+					<div style="color:red;">
+						{{ msg }}
+					</div>
+                </div>
+			{% endfor %}
+		{% endif %}
+		
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+	
+	<!--  =============================== -->
+   <!-- ====== ###### PANEL ######## === -->
+    <!--  =============================== -->
+	
+   <!--  =============================== -->
+   <!-- ====== ###### TABLE CONTENT ######## === -->
+    <!--  =============================== -->
+							
+	<div>
+		<form  action="/user/group/{{ groupid }}/users/add/new/" method="post">
+		{% csrf_token %}
+        <!--  table -->
+				<table id="hor-minimalist-a" class="tableclass" summary="Employee Pay Sheet">
+				    <thead>
+				    	<tr>
+				    		<th scope="col" style="width:25px;">Sr.</th>
+				    		<th scope="col" style="width:40px;">SEL</th>
+				            <th scope="col" style="width:100px;">Name</th>
+				            <th scope="col" style="width:100px;">Email</th>
+				            <th scope="col" style="width:100px">Branch</th>
+				        </tr>
+		    		</thead>
+		    	    <tbody>
+					{% if userlist|length %}
+						{% for user in userlist %}
+							<tr>
+								<td>{{ forloop.counter }}</td>
+								<td><input type="checkbox" name="Group_Userid" value="{{user.id}}" /></td>
+						        <td>{{ user.UserFirstName }}-{{user.UserLastName }}</td>
+								<td>{{ user.UserEmail }}</td>
+								<td>--</td>
+						    </tr>
+						{% endfor %}
+					{% else %}
+						<h1> there are no items </h1>
+					{% endif %}
+					
+				    </tbody>
+				</table>
+				<!--  submit -->
+      			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;" >
+                     <input type="submit" value="Add Users to Group" />
+                </div>
+                 
+			</form>
+		</div>
+	{% endblock %}   
+

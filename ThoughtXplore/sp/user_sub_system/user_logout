@@ -1,0 +1,30 @@
+CREATE OR REPLACE FUNCTION user_logout
+(
+	loginid INTEGER,
+	logout_from INTEGER,
+	time_stamp timestamp with time zone,
+	OUT result INTEGER,
+	OUT rescode INTEGER
+) 
+RETURNS RECORD AS $$
+DECLARE
+	temp INTEGER;
+BEGIN 
+
+UPDATE "txUser_userloginlog"
+SET "LogoutTime"=time_stamp,
+	"Logout_From"=logout_from
+WHERE id=loginid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode := 654;
+	result := -1;
+	RETURN;
+ELSE
+	rescode := 650;
+	result := 1;
+	RETURN;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

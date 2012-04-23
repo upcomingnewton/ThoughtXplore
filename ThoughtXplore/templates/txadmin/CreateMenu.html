@@ -1,0 +1,101 @@
+{% extends "master1.html" %}
+{% block title %}{{ title }}{% endblock%}
+
+{% block master_content_center %}
+		<form  action="/user/menu/create/new/" method="post">
+		{% csrf_token %}
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:15px;margin-bottom:4px;"></div>
+		<!-- title -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:45px;margin-bottom:4px;">
+				<div style="font-size: 35px;">
+                             Create a new menu item 
+                </div>
+		</div>
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+		
+		{% if errorlist|length > 0 %}
+			{% for err in errorlist %}
+				<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+					<div style="color:red;">
+						{{ err }}
+					</div>
+                </div>
+			{% endfor %}
+		{% endif %}
+		
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+		
+		<!--  name  -->
+			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input id="CreateMenu_name" name="CreateMenu_name" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Menu Name
+                     </div>
+                </div>
+     	<!--  desc  -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="CreateMenu_desc" id="CreateMenu_desc" type="text" class="tb1"  onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Menu Desc
+                     </div>
+                </div>
+                
+     	<!--  murl -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="CreateMenu_url" id="CreateMenu_url" type="text" class="tb1"  onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             url
+                     </div>
+                </div>
+                
+                
+     	<!--  micon -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="CreateMenu_micon" id="CreateMenu_micon" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             menu icon upload
+                     </div>
+                </div>
+
+    	<!--  pid -->
+    		{% if par_menu|length > 0 %}
+    			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <select name="CreateMenu_parmenu" id="CreateMenu_parmenu"  class="tb2" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" }} >
+                             		<option value="-1">it is a parent menu</option>
+                             		{% for menu in par_menu %}
+										<option value="{{ menu.id }}">{{ menu.MenuName}}</option>
+									{% endfor %}
+                             </select>
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             gender
+                     </div>
+                </div>
+         	{% else %}
+         				
+         	{% endif %}
+      	<!--  submit -->
+      			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;" >
+                     <input type="submit" value="REGISTER USER" />
+                </div>
+		
+		</form>
+{% endblock %}
+

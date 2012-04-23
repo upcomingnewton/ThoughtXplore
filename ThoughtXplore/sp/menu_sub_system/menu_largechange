@@ -1,0 +1,48 @@
+CREATE OR REPLACE FUNCTION txMenu_menu_statechange(
+csv_mid VARCHAR,
+num_val INTEGER,
+mpid INTEGER,
+request_permission VARCHAR,
+log_desc VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+	temp INTEGER;
+    varrec RECORD;
+BEGIN 
+temp := 0;
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txMenu','menu',request_permission);
+IF varrec.status <> 500 THEN
+	result := -2;
+	rescode := varrec.status;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+
+
+EXECUTE 'UPDATE "txMenu_menu" SET "SCI_id"=$1,"MenuPid"=$2 WHERE id in (' || csv_mid || ')' USING varrec.varsci,mpid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> num_val THEN 
+	result := -1;
+	rescode := 743;
+        RETURN;
+END IF;
+
+
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+						VALUES(varrec.userid,varrec.varpci,-1,now(),ip,log_desc,'NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	result := -1;
+	rescode := 744;
+        RETURN;
+ELSE
+	result := 1;
+	rescode := 740;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

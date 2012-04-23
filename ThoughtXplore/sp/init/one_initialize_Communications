@@ -1,0 +1,77 @@
+/*
+
+Task:
+
+1) Making entries in state content type and permission content type
+2) Insert in CommunicationTypes..
+
+*/
+CREATE OR REPLACE FUNCTION one_initilaize_txCommunication() RETURNS VOID AS $$
+ 
+DECLARE
+
+ result INTEGER;
+BEGIN
+  RAISE NOTICE '=== initializing Communication-sub-system ===';
+
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_comm_CREATE','Create a new Communication');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_comm_DELETE','Delete a Communication');
+
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_template_CREATE','Create Communication Template');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_commtype_CREATE','Create Communication Type');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_template_DELETE','Delete Communication Template');
+
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_commtype_DELETE','Delete Communication Type');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_template_UPDATE','Update Communication Template');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_commtype_UPDATE','Delete Communication Type');
+
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_messagereply_SEND','Send Message Reply');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_messagereply_DELETE','Delete a Message Reply');
+
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_messagegroup_CREATE','Create a Messagegroup');
+ INSERT INTO "txMisc_miscpermission"("PermissionName","PermissionDescription") VALUES('txCommunication_messagegroup_DELETE','Delete a Messagegroup');
+
+ /*Adding to StateContentType*/
+
+ 
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_type' ) ,1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_type') ,1);
+ 
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_templates'),1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_templates'),1);
+
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communications'),1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communications'),1);
+
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_groups'),1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_groups'),1);
+
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='message_replies'),1);
+ INSERT INTO "txMisc_statecontenttype"("State_id","StateContentType_id","StateActive") VALUES(( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='message_replies'),1);
+ 
+ /*
+ 	Adding Permissions: 
+  */
+   
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_comm_CREATE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communications'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_comm_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communications'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'));
+
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_template_CREATE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_templates' ), ( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_template_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_templates'),( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_template_UPDATE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_templates'),( SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ 
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_commtype_CREATE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_type'), (SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_commtype_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_type'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_commtype_UPDATE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_type'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagereply_SEND'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='message_replies'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagereply_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='message_replies'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'));
+ 
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagegroup_CREATE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_groups'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='ACTIVE'));
+ INSERT INTO "txMisc_permissioncontenttype"("Permission_id","PermissionContentType_id", "PermissionActive") VALUES((SELECT id FROM "txMisc_miscpermission" WHERE "PermissionName"='txCommunication_messagegroup_DELETE'),(SELECT id FROM django_content_type WHERE app_label='txCommunications' AND model='communication_groups'),(SELECT id FROM "txMisc_miscstate" WHERE "StateName"='DELETED'));
+  
+
+ /*END ADDING PERMISSIONS */
+ 
+END;
+$$ LANGUAGE plpgsql;

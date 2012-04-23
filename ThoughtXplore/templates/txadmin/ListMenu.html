@@ -1,0 +1,82 @@
+{% extends "master2.html" %}
+    {% block title %}{{ title }}{% endblock %}
+	{% block add_start_script %}
+		<link type="text/css" href="{{STATIC_URL}}css/tables.css" rel="stylesheet" type="text/css" />
+	{% endblock %}
+	{% block master_content_center %}
+	<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:15px;margin-bottom:4px;"></div>
+   <!--  =============================== -->
+   <!-- ====== ###### TITLE ######## === -->
+    <!--  =============================== -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:45px;margin-bottom:4px;">
+				<div style="font-size: 35px;">
+                            LISTING ALL MENU ITEM's
+                </div>
+		</div>
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+		
+	<!--  =============================== -->
+   <!-- ====== ###### MESSAGE LIST ######## === -->
+    <!--  =============================== -->
+		{% if errorlist|length > 0 %}
+			{% for err in errorlist %}
+				<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+					<div style="color:red;">
+						{{ err }}
+					</div>
+                </div>
+			{% endfor %}
+		{% endif %}
+		
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+	
+	<!--  =============================== -->
+   <!-- ====== ###### PANEL ######## === -->
+    <!--  =============================== -->
+	
+   <!--  =============================== -->
+   <!-- ====== ###### TABLE CONTENT ######## === -->
+    <!--  =============================== -->
+							
+			<div>
+				<table id="hor-minimalist-a" class="tableclass" summary="Employee Pay Sheet">
+				    <thead>
+				    	<tr>
+				    		<th scope="col" style="width:40px;">SEL</th>
+				        	<th scope="col" style="width:25px;">Sr.</th>
+				            <th scope="col" style="width:50px;">Name</th>
+				            <th scope="col" style="width:150px;">Url</th>
+				            <th scope="col" style="width:25px;">Pid</th>
+				            <th scope="col" style="width:25px;">SCI</th>
+				            <th scope="col" style="width:60px;">Icon</th>
+				            <th scope="col" style="width:60px;">EDIT</th>
+				            <th scope="col" style="width:60px;">DEL.</th>
+				        </tr>
+		    		</thead>
+		    	    <tbody>
+					{% if menulist|length %}
+						{% for menu in menulist %}
+							<tr>
+								<td><input type="checkbox" name="CheckBox_EditOptions" value="{{menu.id}}" /></td>
+								<td>{{ forloop.counter }}</td>
+						        <td>{{ menu.MenuName }}</td>
+						        <td>{{ menu.MenuUrl }}</td>
+						        <td>{{ menu.MenuPid }}</td>
+						        <td>{{ menu.SCI.id }}</td>
+						        <td>lolwa</td>
+						        <td><a href="/user/menu/{{menu.id}}/edit/"><input type="button" value="EDIT" /></a></td>
+						        <td><a href="/user/menu/{{menu.id}}/edit/"><input type="button" value="DEL" /></a></td>
+						    </tr>
+						{% endfor %}
+					{% else %}
+						<h1> there are no items </h1>
+					{% endif %}
+					
+				    </tbody>
+				</table>
+		</div>
+	{% endblock %}   
+

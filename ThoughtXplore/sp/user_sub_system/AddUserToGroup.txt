@@ -1,0 +1,43 @@
+CREATE OR REPLACE FUNCTION txUser_usergroup_insert(
+groupid INTEGER,
+userid VARCHAR,
+logsdesc VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT updated_users INTEGER,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    temp INTEGER;
+    varrec RECORD;
+BEGIN 
+temp := 0;
+
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','usergroup','UPDATE');
+IF varrec.status <> 500 THEN
+	rescode :=  varrec.status;
+	result := -2;
+     --   ROLLBACK;
+	RETURN;
+END IF;
+
+
+EXECUTE 'UPDATE "txUser_usergroup" SET "Group_id"=$1  WHERE "User_id" IN (' || userid || ')' USING groupid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+updated_users := temp;
+
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+			VALUES(varrec.userid,varrec.varpci,-1,now(),ip,logsdesc,'NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+IF temp <> 1 THEN 
+	rescode := 1401;
+	result := -1;
+        RETURN;
+ELSE
+	rescode := groupid;
+	result := 1;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;

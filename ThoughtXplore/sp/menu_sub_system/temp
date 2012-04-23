@@ -1,0 +1,15 @@
+SELECT * FROM txMenu_menu_insert('test1','test','test',-1,'test',1,'test');
+SELECT * FROM txMenu_menu_insert('test2','test','test',-1,'test',2,'test');
+SELECT * FROM txMenu_menu_insert('test3','test','test',-1,'test',3,'test');
+SELECT * FROM txMenu_menu_insert('test4','test','test',-1,'test',9999,'test');
+
+SELECT * FROM txMenu_menu_insert('test1','test','url1',1,'test',1,'test');
+SELECT * FROM txMenu_menu_insert('test1','test','url2',1,'test',1,'test');
+SELECT * FROM txMenu_menu_insert('test1','test','url3',1,'test',1,'test');
+SELECT * FROM txMenu_menu_insert('test1','test','url4',1,'test',1,'test');
+
+SELECT * FROM txMenu_menu_edit(1,'test3','test3','test3',90,'test3','UPDATE','test3','test3',1,'test3');
+SELECT * FROM txMenu_menu_statechange('1,2,3',2,'UPDATE','logsdesc',1,'ip');
+
+
+SELECT * FROM txUser_group_insert(7,'2,3,4,5',4,1,'test');

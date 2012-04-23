@@ -1,5 +1,3 @@
-                                                               
-                                             
 CREATE OR REPLACE FUNCTION one_system_initialize_user_system() RETURNS VOID AS $$
 
 /*
@@ -239,11 +237,11 @@ SELECT id INTO row_index FROM django_content_type WHERE app_label='txUser' AND m
 SELECT id INTO var_usersci_index FROM "txMisc_statecontenttype" WHERE "StateContentType_id"=row_index AND "State_id"=var_state_active AND "StateActive"=1;
 SELECT id INTO var_userentity_index FROM "txMisc_entity" WHERE "EntityName"='system';
 INSERT INTO "txUser_user"("UserEmail","UserPassword","UserFirstName","UserMiddleName","UserLastName","UserGender","UserBirthDate","UserEntity_id","SCI_id") 
-					VALUES('admin1@tx.com','pass','admin1','admin1','admin1','M',current_date,var_userentity_index,var_usersci_index);
+					VALUES('admin1@tx.com','2fqS4_SL143_SHaOm4nuQPLJrPscNumYJr8Twl2Lt3h_P4L5U6S989FqYg64=','admin1','admin1','admin1','M',current_date,var_userentity_index,var_usersci_index);
 INSERT INTO "txUser_user"("UserEmail","UserPassword","UserFirstName","UserMiddleName","UserLastName","UserGender","UserBirthDate","UserEntity_id","SCI_id") 
-					VALUES('CreateUserDeamon@tx.com','pass','CreateUserDeamon','CreateUserDeamon','CreateUserDeamon','M',current_date,var_userentity_index,var_usersci_index);
+					VALUES('CreateUserDeamon@tx.com','2fqS4_SL143_SHaOm4nuQPLJrPscNumYJr8Twl2Lt3h_P4L5U6S989FqYg64=','CreateUserDeamon','CreateUserDeamon','CreateUserDeamon','M',current_date,var_userentity_index,var_usersci_index);
 INSERT INTO "txUser_user"("UserEmail","UserPassword","UserFirstName","UserMiddleName","UserLastName","UserGender","UserBirthDate","UserEntity_id","SCI_id") 
-					VALUES('AuthenticateUserDaemon@tx.com','pass','AuthenticateUserDaemon','AuthenticateUserDaemon','AuthenticateUserDaemon','M',current_date,var_userentity_index,var_usersci_index);
+					VALUES('AuthenticateUserDaemon@tx.com','2fqS4_SL143_SHaOm4nuQPLJrPscNumYJr8Twl2Lt3h_P4L5U6S989FqYg64=','AuthenticateUserDaemon','AuthenticateUserDaemon','AuthenticateUserDaemon','M',current_date,var_userentity_index,var_usersci_index);
 SELECT COUNT(id) INTO result FROM "txUser_user";
 RAISE NOTICE '[USER TRACE] ROW COUNT OF txUser_user is % ',result;
 

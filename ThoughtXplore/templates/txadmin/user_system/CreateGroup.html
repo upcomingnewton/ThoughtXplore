@@ -1,0 +1,100 @@
+{% extends "master2.html" %}
+    {% block title %}{{ title }}{% endblock %}
+    {% block add_start_script %}
+		<link type="text/css" href="{{STATIC_URL}}css/tables.css" rel="stylesheet" type="text/css" />
+	{% endblock %}
+	{% block master_content_center %}
+	<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:15px;margin-bottom:4px;"></div>
+   <!--  =============================== -->
+   <!-- ====== ###### TITLE ######## === -->
+    <!--  =============================== -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:45px;margin-bottom:4px;">
+				<div style="font-size: 35px;">
+                       Create Group
+                </div>
+		</div>
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+		
+	<!--  =============================== -->
+   <!-- ====== ###### MESSAGE LIST ######## === -->
+    <!--  =============================== -->
+		{% if msglist|length > 0 %}
+			{% for msg in msglist %}
+				<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+					<div style="color:red;">
+						{{ msg }}
+					</div>
+                </div>
+			{% endfor %}
+		{% endif %}
+		
+		<!-- empty line  -->
+		<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;"></div>
+	
+	<!--  =============================== -->
+   <!-- ====== ###### PANEL ######## === -->
+    <!--  =============================== -->
+	
+   <!--  =============================== -->
+   <!-- ====== ###### TABLE CONTENT ######## === -->
+    <!--  =============================== -->
+							
+	<div>
+		<form  action="/user/group/create/new/" method="post">
+		{% csrf_token %}
+		<!--  name  -->
+			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input id="Group_Name" name="Group_Name" type="text" class="tb1" onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                             Group Name
+                     </div>
+                </div>
+     	<!--  desc  -->
+                <div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;">
+                     <div style="width:300px;height:30px;float:left;">
+                             <input name="Group_Desc" id="Group_Desc" type="text" class="tb1"  onfocus="on_focus(this.id)" onblur="on_blur(this.id)" />
+                     </div>
+                     <div style="width:30px;height:30px;float:left;"></div>
+                     <div style="width:210px;float:left;height:30px;padding-left:5px;">
+                            Group Desc
+                     </div>
+                </div>
+        <!--  table -->
+				<table id="hor-minimalist-a" class="tableclass" summary="Employee Pay Sheet">
+				    <thead>
+				    	<tr>
+				    		<th scope="col" style="width:40px;">SEL</th>
+				            <th scope="col" style="width:50px;">Name</th>
+				            <th scope="col" style="width:150px;">Url</th>
+				            <th scope="col" style="width:150px">Desc</th>
+				        </tr>
+		    		</thead>
+		    	    <tbody>
+					{% if menulist|length %}
+						{% for menu in menulist %}
+							<tr>
+								<td><input type="checkbox" name="Group_MenuOptions" value="{{menu.id}}" /></td>
+						        <td>{{ menu.MenuName }}</td>
+						        <td>{{ menu.MenuUrl }}</td>
+								 <td>{{ menu.MenuDesc }}</td>
+						    </tr>
+						{% endfor %}
+					{% else %}
+						<h1> there are no items </h1>
+					{% endif %}
+					
+				    </tbody>
+				</table>
+				<!--  submit -->
+      			<div style="width:550px;border-bottom:1px solid #cccccc;height:30px;margin-bottom:4px;" >
+                     <input type="submit" value="CREATE GROUP" />
+                </div>
+			</form>
+		</div>
+	{% endblock %}   
+
