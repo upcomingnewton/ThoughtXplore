@@ -1,8 +1,12 @@
 CREATE OR REPLACE FUNCTION txUser_group_insert(
-groupid INTEGER,
+group_name VARCHAR,
+group_desc VARCHAR,
+type INTEGER,
 menuidlist VARCHAR,
 count_menulist INTEGER,
-logsdesc VARCHAR,
+log_menuidlist VARCHAR,
+entity VARCHAR,
+request_state VARCHAR,
 by_user INTEGER,
 ip VARCHAR,
 OUT result INTEGER,
@@ -12,7 +16,6 @@ DECLARE
     temp INTEGER;
     gid INTEGER;
     varrec RECORD;
-    temp_count INTEGER;
     x INTEGER;
     num_menu INTEGER;
 BEGIN 
@@ -27,10 +30,16 @@ num_menu := 0;
 5. insert logs , check for logs and commit
 */
 
-
+/*  1. check if user exists or not   */
+IF EXISTS ( SELECT id FROM "txUser_group" WHERE "GroupName"=group_name) THEN
+    SELECT id INTO rescode  FROM "txUser_group" WHERE "GroupName"=group_name;
+	result := 2;
+      --  ROLLBACK;
+	RETURN;
+END IF;
 
 /*  2. check if requesting user has right to register this user at this state  */
-SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txMenu','groupmenu','INSERT');
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txUser','group',request_state);
 IF varrec.status <> 500 THEN
 	rescode :=  varrec.status;
 	result := -2;
@@ -38,49 +47,52 @@ IF varrec.status <> 500 THEN
 	RETURN;
 END IF;
 
-SELECT COUNT(id) INTO temp_count FROM "txMenu_groupmenu" WHERE "Group_id"=groupid;
-RAISE NOTICE 'COUNT IS %',temp_count;
 
-DELETE FROM "txMenu_groupmenu"
-WHERE "Group_id" = groupid;
+
+/*  3. INSERT DATA INTO USER TABLE */
+INSERT INTO "txUser_group"("GroupName","GroupDescription","GroupType_id","SCI_id","GroupEntity_id") 
+		VALUES(group_name,group_desc,type,varrec.varsci,(SELECT id FROM "txMisc_entity" WHERE "EntityName"=entity));
 GET DIAGNOSTICS temp := ROW_COUNT;
-RAISE NOTICE ' changed rows are : %',temp;
-IF temp <> temp_count THEN 
+--RAISE NOTICE 'INSERT USER, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	rescode := 1401;
 	result := -1;
-	rescode := 707;
+      --  ROLLBACK;
         RETURN;
 END IF;
+--RAISE NOTICE 'INSERT USER, id IS %',in_userid;
 
-
+ SELECT id INTO gid FROM "txUser_group" WHERE "GroupName"=group_name;
 <<group_menu_insert>>
 	
 	FOR x IN SELECT id FROM "txMenu_menu" LOOP
 		 IF NOT EXISTS ( SELECT id FROM "txMenu_groupmenu" WHERE "Group_id"=gid AND "Active"=1 AND "Menu_id"=x ) THEN
-			INSERT INTO "txMenu_groupmenu"("Group_id","Menu_id","Active") VALUES(groupid,x,0);
+			INSERT INTO "txMenu_groupmenu"("Group_id","Menu_id","Active") VALUES(gid,x,0);
 			GET DIAGNOSTICS temp := ROW_COUNT;
 			IF temp <> 1 THEN 
-				rescode := 702;
+				rescode := 1402;
+				result := -1;
 				RETURN;
 			END IF;
 		END IF;
 	END LOOP group_menu_insert;
 
-EXECUTE 'UPDATE "txMenu_groupmenu" SET "Active"=1 WHERE "Menu_id" IN (' || menuidlist || ') AND "Group_id"=$1' USING groupid;
+EXECUTE 'UPDATE "txMenu_groupmenu" SET "Active"=1 WHERE "Menu_id" IN (' || menuidlist || ') AND "Group_id"=$1' USING gid;
 GET DIAGNOSTICS temp := ROW_COUNT;
 RAISE NOTICE ' changed rows are : %',temp;
 IF temp <> count_menulist THEN 
 	result := -1;
-	rescode := 704;
+	rescode := 1403;
         RETURN;
 END IF;
 
 /* 4. MAKE A LOG ENTRY */
 INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
-			VALUES(varrec.userid,varrec.varpci,-1,now(),ip,logsdesc,'NULL');
+			VALUES(varrec.userid,varrec.varpci,gid,now(),ip,log_menuidlist,'NULL');
 GET DIAGNOSTICS temp := ROW_COUNT;
 --RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
-	rescode := 703;
+	rescode := 999;
 	result := -1;
       --  ROLLBACK;
         RETURN;

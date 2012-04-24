@@ -15,6 +15,7 @@ from ThoughtXplore.txMisc import enc_dec
     
 def Login_index(HttpRequest):
     errorlist = []
+    print 'i am here'
     return render_to_response('txUser/Login.html',{'title':'Login','errorlist':errorlist},context_instance=RequestContext(HttpRequest))
 
 

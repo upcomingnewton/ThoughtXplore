@@ -19,32 +19,19 @@ DECLARE
     varrec RECORD;
 BEGIN 
 temp := 0;
-/*
-1. check if same menu exists or not
-2. check if this user has permission for insertion orn not
-3. insert into menu table
-4. make a log entry
-*/
-
-/*  1. check if user exists or not   */
 IF NOT EXISTS ( SELECT id FROM "txMenu_menu" WHERE id=mid ) THEN
-	RAISE NOTICE 'INSIDE IF';
 	result := -1;
-	rescode := 731;
-      --  ROLLBACK;
+	rescode := 1201;
 	RETURN;
 END IF;
 
-/*  2. check if requesting user has right to register this user at this state  */
 SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txMenu','menu',maction);
 IF varrec.status <> 500 THEN
 	result := -2;
 	rescode := varrec.status;
-     --   ROLLBACK;
 	RETURN;
 END IF;
 
-/*  3. INSERT DATA INTO USER TABLE */
 UPDATE "txMenu_menu"
 SET  "MenuName"=mname,
 	 "MenuUrl"=murl,
@@ -56,22 +43,20 @@ WHERE id=mid;
 GET DIAGNOSTICS temp := ROW_COUNT;
 IF temp <> 1 THEN 
 	result := -1;
-	rescode := 733;
+	rescode := 1202;
         RETURN;
 END IF;
 
-/* 4. MAKE A LOG ENTRY */
 INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
 						VALUES(varrec.userid,varrec.varpci,mid,now(),ip,log_desc,log_prev);
 GET DIAGNOSTICS temp := ROW_COUNT;
---RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
 IF temp <> 1 THEN 
 	result := -1;
-	rescode := 734;
+	rescode := 999;
         RETURN;
 ELSE
 	result := 1;
-	rescode := 730;
+	rescode := 1205;
 END IF;
 RETURN;
 END;

@@ -1,0 +1,83 @@
+CREATE OR REPLACE FUNCTION txUser_group_insert(
+groupid INTEGER,
+menuidlist VARCHAR,
+count_menulist INTEGER,
+logsdesc VARCHAR,
+by_user INTEGER,
+ip VARCHAR,
+OUT result INTEGER,
+OUT rescode INTEGER
+) RETURNS RECORD AS $$
+DECLARE 
+    temp INTEGER;
+    gid INTEGER;
+    varrec RECORD;
+    temp_count INTEGER;
+    x INTEGER;
+    num_menu INTEGER;
+BEGIN 
+temp := 0;
+x := 0;
+num_menu := 0;
+SELECT * INTO varrec FROM CheckUserForPermission(by_user,'txMenu','groupmenu','INSERT');
+IF varrec.status <> 500 THEN
+	rescode :=  varrec.status;
+	result := -2;
+	RETURN;
+END IF;
+
+SELECT COUNT(id) INTO temp_count FROM "txMenu_groupmenu" WHERE "Group_id"=groupid;
+RAISE NOTICE 'COUNT IS %',temp_count;
+
+DELETE FROM "txMenu_groupmenu"
+WHERE "Group_id" = groupid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+RAISE NOTICE ' changed rows are : %',temp;
+IF temp <> temp_count THEN 
+	result := -1;
+	rescode := 1501;
+        RETURN;
+END IF;
+
+
+<<group_menu_insert>>
+	
+	FOR x IN SELECT id FROM "txMenu_menu" LOOP
+		 IF NOT EXISTS ( SELECT id FROM "txMenu_groupmenu" WHERE "Group_id"=gid AND "Active"=1 AND "Menu_id"=x ) THEN
+			INSERT INTO "txMenu_groupmenu"("Group_id","Menu_id","Active") VALUES(groupid,x,0);
+			GET DIAGNOSTICS temp := ROW_COUNT;
+			IF temp <> 1 THEN 
+				rescode := 1502;
+				result := -1;
+				RETURN;
+			END IF;
+		END IF;
+	END LOOP group_menu_insert;
+
+EXECUTE 'UPDATE "txMenu_groupmenu" SET "Active"=1 WHERE "Menu_id" IN (' || menuidlist || ') AND "Group_id"=$1' USING groupid;
+GET DIAGNOSTICS temp := ROW_COUNT;
+RAISE NOTICE ' changed rows are : %',temp;
+IF temp <> count_menulist THEN 
+	result := -1;
+	rescode := 1503;
+        RETURN;
+END IF;
+
+/* 4. MAKE A LOG ENTRY */
+INSERT INTO "txUser_userlogs"("LogsUser_id","LogsPCI_id","LogsObject","LogsTimeStamp","LogsIP","LogsDescription","LogsPreviousState") 
+			VALUES(varrec.userid,varrec.varpci,-1,now(),ip,logsdesc,'NULL');
+GET DIAGNOSTICS temp := ROW_COUNT;
+--RAISE NOTICE 'INSERT USER LOGS, ROW COUNT IS %',temp;
+IF temp <> 1 THEN 
+	rescode := 999;
+	result := -1;
+      --  ROLLBACK;
+        RETURN;
+ELSE
+	rescode := gid;
+	result := 1;
+	--COMMIT;
+END IF;
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
