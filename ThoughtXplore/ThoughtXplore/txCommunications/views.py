@@ -30,15 +30,11 @@ def iframeNotice(request,ref):
 
     return render_to_response('main/txCommunications/notice_iframe.html',{'Subject':subject,'message':message, 'time':time},context_instance=RequestContext(request))
 
-def Index_viewnotices(request, token, ref):
+def Index_viewnotices(request, ref):
     
     
     try:
-        if token=="4089":
-            admin=1
-        else:
-            admin=0
-        
+       
             
         for i in Communication_Type.objects.filter(type="notice"):
             ct_id=i.id
@@ -76,14 +72,14 @@ def Index_viewnotices(request, token, ref):
         Comm=Com
         
         print "done"
-        return render_to_response('main/txCommunications/View_Notices.html',{'title':'Notices','admin':admin, 'Notices':Comm },context_instance=RequestContext(request))
+        return render_to_response('main/txCommunications/View_Notices.html',{'title':'Notices', 'Notices':Comm },context_instance=RequestContext(request))
     except:
         return HttpResponse("error")
     
 def Indexnotices(request, token):
     
     try:
-        if token=="4089":
+        if token=="5614":
             return render_to_response('main/txCommunications/Admin_Notices.html',{'title':'Admin Notices','fromUserID':3, 'type':'notice' },context_instance=RequestContext(request))
         
         else:
@@ -165,7 +161,7 @@ def Index_viewnews(request, ref):
 def IndexNews(request, token):
     
     try:
-        if token=="4089":
+        if token=="5614":
             return render_to_response('main/txCommunications/Admin_Notices.html',{'title':'Admin Notices','fromUserID':3, 'type':'UIETHappenings' },context_instance=RequestContext(request))
         
         else:
