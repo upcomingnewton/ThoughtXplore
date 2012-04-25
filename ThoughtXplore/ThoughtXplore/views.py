@@ -12,3 +12,5 @@ def NoteDirIndex(request):
     return render_to_response('main/Director-Message.html',{'title':'Director UIET'},context_instance=RequestContext(request))
 def IndexContacts(request):
     return render_to_response('main/contacts.html',{'title':'Contact Us'},context_instance=RequestContext(request))
+def IndexLogin(request):
+    return render_to_response('main/login.html',{'title':'User Login'},context_instance=RequestContext(request))

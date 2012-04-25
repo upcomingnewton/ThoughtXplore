@@ -7,7 +7,8 @@ urlpatterns = patterns('',
     url(r'^register/new/$','txUser.views.CreateUserFromSite'),
     url(r'^message/(?P<message>\S+)/$','txUser.views.MessageIndex'),
     url(r'^authenticate/email/(?P<token>\S+)/(?P<refs>\d+)/$','txUser.views.AuthenticateUserFromEmail'),    url(r'^test/$','txMisc.views.test'),
-          
+    url(r'^login/$', 'ThoughtXplore.views.IndexLogin', name='Login'),
+         
         
         
 )               
