@@ -38,7 +38,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'thoughtxplore@gmail.com'
 EMAIL_HOST_PASSWORD = 'NewalaTX:)'
-EMAIL_PORT = 587
+
+EMAIL_PORT = 1025
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
@@ -76,7 +78,9 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+
     '/home/nitin/git/ThoughtXplore/ThoughtXplore/static/',
+
 )
 
 # List of finder classes that know how to find static files in
@@ -113,7 +117,9 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+
     "/home/nitin/git/ThoughtXplore/ThoughtXplore/templates"
+
 )
 
 INSTALLED_APPS = (

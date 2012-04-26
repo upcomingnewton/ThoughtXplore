@@ -95,7 +95,7 @@ def send_notice(details):
         
     print details
     print "till here"
-    for i in Communication_Type.objects.filter(type="notice"):
+    for i in Communication_Type.objects.filter(type=details["type"]):
         CommTypeID=i.id
     
     if not Communication_Templates.objects.filter(TemplateName="Default").exists():
@@ -144,7 +144,7 @@ def send_notice(details):
            'ip':ip,
            'comm_code_name': 'General Notice',
            'Message':message,
-           'TimeStamp':datetime.now(),
+           'TimeStamp':details["timestamp_"],
 
             }
     print param

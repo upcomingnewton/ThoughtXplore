@@ -2,49 +2,49 @@
 
 from django.db import models
 from ThoughtXplore import txMisc, txUser
+from ThoughtXplore.txMisc.models import StateContentType, PermissionContentType
+from ThoughtXplore.txUser.models import User
 
+class test_cities(models.Model):
+    name=models.TextField()
+    country= models.TextField()
+    
+
+class test_centres(models.Model):
+    name=models.TextField()
+    address=models.TextField()
+    city= models.ForeignKey(test_cities)
+    capacity=models.IntegerField()
 
 class Subjects(models.Model):
     """
     This class defines all the subjects
-    
     """
-    Subject_id= models.IntegerField()
-    Subject_name= models.CharField(max_length=50)
+    name= models.CharField(max_length=50)
     Description= models.TextField()
-    Subject_id.primary_key=True
-    
-class Topics(models.Model):
-    """
-    
-    """
-    Topic_id= models.IntegerField()
-    Subject_id= models.ForeignKey(Subjects)
-    Topic_name= models.CharField(max_length=50)
-    Topic_id.primary_key=True
-    
+    SCI= models.ForeignKey(StateContentType)
+     
     
 class Question_levels(models.Model):
     """
     here questions in different levels will have different scoring criteria  
     """
     
-    Level_id= models.IntegerField()
     Level_name= models.CharField(max_length=50)
     Level_Desc= models.TextField()
     Level_marks_correct= models.FloatField()
     Level_marks_wrong= models.FloatField()
-    Level_id.primary_key=True
-    
+    SCI= models.ForeignKey(StateContentType)
+
 class Qtype(models.Model):
     """
     This class defines the type of the quiz
     
     """
-    Qtype_id= models.IntegerField();
-    Quiz_type= models.CharField(max_length=50)
+    Quiz_type= models.TextField()
     Qtype_desc=models.TextField()
-    Qtype_id.primary_key= True;
+    SCI= models.ForeignKey(StateContentType)
+    
     
 class Quiz_Main(models.Model):
     """
@@ -53,47 +53,49 @@ class Quiz_Main(models.Model):
     questions, score and all.
        
     """
-    Quiz_id= models.IntegerField()
+    test_centres=models.TextField()   #comma seperated centre ids
     Ref_ID= models.IntegerField()
     Quiz_title= models.CharField(max_length=100)
     Quiz_Desc= models.TextField()
     Quiz_Expiry= models.DateTimeField()
     Quiz_Activation= models.DateTimeField()
-    Qtype_id= models.ForeignKey(Qtype)
+    Qtype= models.ForeignKey(Qtype)
     Total_Questions= models.IntegerField()
     Total_score= models.FloatField()  #to be updated after selecting all the questions for the quiz 
     Cut_Off= models.FloatField()    #to be calculated on the basis of no_of questions selected from each level
     Attempt_credits= models.IntegerField()
-    Quiz_id.primary_key=True
-
+    Subjects=models.TextField()   #it will contain comma seperated ids of Subjects included in this quiz
+    SCI= models.ForeignKey(StateContentType)
+    
+    
 class Questions(models.Model):
 
     """
     will serve as a quesion_bank for any quiz  
     """
     # Quiz_id= models.ForeignKey(Quiz_Main)
-    Ques_id= models.IntegerField()
+    Subject= models.ForeignKey(Subjects)
     Question_detail= models.TextField()
-    Level_id= models.ForeignKey(Question_levels)
-    Topic_id= models.ForeignKey(Topics)
-    Pic_id= models.IntegerField()
-    Ques_id.primary_key=True
+    Level= models.ForeignKey(Question_levels)
+    Pics= models.TextField()       #it will have comma seperated ids of pictures  as a question may use more than one pic....
+    SCI= models.ForeignKey(StateContentType)
     
     
-class Solutions(models.Model):
+class Solutions(models.Model):       #each row will be an option for some questions
     
     """
     """
-    Sol_id= models.IntegerField()
-    Ques_id= models.ForeignKey(Questions)
+    Ques= models.ForeignKey(Questions)
     Options_desc=models.TextField()
     Is_correct=models.BooleanField()
-    Pic_id= models.IntegerField()
-    Sol_id.primary_key=True
+    Pics= models.TextField()       #it will have comma seperated ids of pictures  as it may use more than one pic....
+    SCI= models.ForeignKey(StateContentType)
     
-class Quiz_level_mapping(models.Model):
-    Quiz_id= models.ForeignKey(Quiz_Main)
-    Level_id= models.ForeignKey(Question_levels)
+class Quiz_sub_level_mapping(models.Model):
+    
+    Quiz= models.ForeignKey(Quiz_Main)
+    Subject=models.ForeignKey(Subjects)
+    Level= models.ForeignKey(Question_levels)
     Level_question_count= models.IntegerField() #to be used for setting no of question per level in a quiz for auto selecting questions mapped with that quiz
     Level_cutoff= models.IntegerField()
     
@@ -106,26 +108,40 @@ class QQmapping(models.Model):
     quizes
     
     """
-    Quiz_id= models.ForeignKey(Quiz_Main)
-    Ques_id=models.ForeignKey(Questions)
+    Quiz= models.ForeignKey(Quiz_Main)
+    Ques=models.ForeignKey(Questions)
 
-
+class QAdmins(models.Model):
+    
+    Quiz= models.ForeignKey(Quiz_Main)
+    User= models.ForeignKey(txUser.models.User)
+    Permission=models.ForeignKey(PermissionContentType)
+    
 class QUsers(models.Model):
     """
     """
-    
-    Quiz_id= models.ForeignKey(Quiz_Main)
-    Perm_id= models.ForeignKey(txMisc.models.PermissionContentType)
-    User_id= models.ForeignKey(txUser.models.User)
+    test_centre=models.ForeignKey(test_centres)
+    Registration_No= models.TextField()
+    Registration_No.unique= True
+    Quiz= models.ForeignKey(Quiz_Main)
+    User= models.ForeignKey(txUser.models.User)
     Attempts_Credits_left= models.IntegerField()
+    
+class subject_wise_attempts(models.Model):
+    
+    Quiz=models.ForeignKey(Quiz_Main)
+    User=models.ForeignKey(txUser.models.User)
+    subject= models.ForeignKey(Subjects)
+    Score= models.FloatField()   
+    Q_attempted=models.IntegerField()
+    Correct_attempts=models.IntegerField()
+    
     
 class Complete_Quiz_Attempts(models.Model):
     """
     """
-    Attempt_id=models.IntegerField()
-    Attempt_id.primary_key=True
-    Quiz_id=models.ForeignKey(Quiz_Main)
-    User_id=models.ForeignKey(txUser.models.User)
+    Quiz=models.ForeignKey(Quiz_Main)
+    User=models.ForeignKey(txUser.models.User)
     Attempt_date_time=models.DateTimeField()
     Score= models.FloatField()   
     Q_attempted=models.IntegerField()
@@ -133,16 +149,27 @@ class Complete_Quiz_Attempts(models.Model):
     
     
 class User_Attempt_Details(models.Model):
+    """  
     """
-    
-    """
-    Attempt_id= models.ForeignKey(Complete_Quiz_Attempts)
-    Ques_id=models.ForeignKey(Quiz_Main)
+    Attempt= models.ForeignKey(Complete_Quiz_Attempts)
+    Ques=models.ForeignKey(Quiz_Main)
     Ques_index= models.IntegerField()
     User_solution= models.CharField(max_length=50)
     Correct_solution= models.CharField(max_length=50)
     Is_attempted= models.BooleanField()
-    Level_id= models.ForeignKey(Question_levels)
+    Level= models.ForeignKey(Question_levels)
     Ques_score=models.FloatField()  #to be calculated on the basis of scoring_scheme in table Question_levels
 
+
+class QuizLogs(models.Model):
+    
+    # user making changes
+    LogsUser = models.ForeignKey(User)
+    # row id being changed
+    LogsObject = models.IntegerField()
+    LogsPCI = models.ForeignKey(PermissionContentType)
+    LogsIP = models.CharField(max_length=20)
+    LogsTimeStamp = models.DateTimeField()
+    LogsDescription = models.CharField(max_length=200)
+    LogsPreviousState = models.CharField(max_length=5000)
     

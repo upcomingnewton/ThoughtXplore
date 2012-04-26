@@ -6,6 +6,7 @@ urlpatterns = patterns('',
     # USER REGISTRATION , LOGIN AND RELATED STUFF
     url(r'^register/$','txUser.views.CreateUserIndex'),
     url(r'^register/new/$','txUser.views.CreateUserFromSite'),
+
     url(r'^login/$','txUser.views.Login_index'),
     url(r'^login/log_in/$','txUser.views.log_in'),
     url(r'^login/log_out/$','txUser.views.log_out'),

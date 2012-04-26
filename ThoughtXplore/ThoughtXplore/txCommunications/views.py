@@ -30,15 +30,11 @@ def iframeNotice(request,ref):
 
     return render_to_response('main/txCommunications/notice_iframe.html',{'Subject':subject,'message':message, 'time':time},context_instance=RequestContext(request))
 
-def Index_viewnotices(request, token, ref):
+def Index_viewnotices(request, ref):
     
     
     try:
-        if token=="4089":
-            admin=1
-        else:
-            admin=0
-        
+       
             
         for i in Communication_Type.objects.filter(type="notice"):
             ct_id=i.id
@@ -68,21 +64,23 @@ def Index_viewnotices(request, token, ref):
             i.Message=loads(i.Message.decode("base64").decode("zip"))
             i.Subject=loads(i.Subject.decode("base64").decode("zip"))
             print i.ParameterDict
+            print "lol"
+        print Comm
         Com=[]
         for i in reversed(Comm):
             Com.append(i)
         Comm=Com
         
         print "done"
-        return render_to_response('main/txCommunications/View_Notices.html',{'title':'Notices','admin':admin, 'Notices':Comm },context_instance=RequestContext(request))
+        return render_to_response('main/txCommunications/View_Notices.html',{'title':'Notices', 'Notices':Comm },context_instance=RequestContext(request))
     except:
         return HttpResponse("error")
     
 def Indexnotices(request, token):
     
     try:
-        if token=="4089":
-            return render_to_response('main/txCommunications/Admin_Notices.html',{'title':'Admin Notices','fromUserID':3 },context_instance=RequestContext(request))
+        if token=="5614":
+            return render_to_response('main/txCommunications/Admin_Notices.html',{'title':'Admin Notices','fromUserID':3, 'type':'notice' },context_instance=RequestContext(request))
         
         else:
             return HttpResponse("UNAUTHORIZED ACCESS")
@@ -112,15 +110,103 @@ def Indexnotices(request, token):
         return render_to_response('txCommunications/notice.htm',{'title':'Notices','Users':user_,'CommType' :CommType, 'Template':TemplateID, 'paramlist': param_list_to_send},context_instance=RequestContext(request))
     except:
         return HttpResponse("error")
+def Index_viewnews(request, ref):
+    
+    
+    try:
+        
+            
+        for i in Communication_Type.objects.filter(type="UIETHappenings"):
+            ct_id=i.id
+        print ct_id
+        Comm= Communications.objects.filter(Commtype_id=ct_id).order_by('DateTimeSent')
+        
+        print Comm
+        print "here"
+        for i in Comm:
+            a=i.DateTimeSent
+        
+            d2 = time.strptime(a,'%Y-%m-%d %H:%M:%S')
+
+            d3={'day':d2.tm_mday,
+                'month':decode_month(d2.tm_mon),
+                'year':d2.tm_year
+                }       
+            print d2
+            dt = datetime.fromtimestamp(mktime(d2))
+            print dt
+            
+                        
+            #time_string=d2
+            #d3= time.strftime(d2, "%Y %B %d %H %M %S")
+            #print d2
+            i.DateTimeSent=d3
+            #i.ParameterDict=d2.tm_mday
+            #i.TemplateID_id=decode_month(d2.tm_mon)
+            i.Message=loads(i.Message.decode("base64").decode("zip"))
+            i.Subject=loads(i.Subject.decode("base64").decode("zip"))
+            print i.ParameterDict
+            print "hi"
+        print "lol"
+        Com=[]
+        for i in reversed(Comm):
+            Com.append(i)
+        Comm=Com
+        
+        print "done"
+        return render_to_response('main/txCommunications/View_Notices.html',{'title':'Happenings@UIET', 'Notices':Comm },context_instance=RequestContext(request))
+    except:
+        return HttpResponse("error")
+    
+def IndexNews(request, token):
+    
+    try:
+        if token=="5614":
+            return render_to_response('main/txCommunications/Admin_Notices.html',{'title':'Admin Notices','fromUserID':3, 'type':'UIETHappenings' },context_instance=RequestContext(request))
+        
+        else:
+            return HttpResponse("UNAUTHORIZED ACCESS")
+    except:
+        return HttpResponse("error")
+    
+    t=0
+    try:
+        user_= User.objects.all()
+        CommType=Communication_Type.objects.filter(type="UIETHappenings")
+        #print "here"
+        
+        for i in CommType:
+            t=i.id
+        #print "here1"
+        if(t==0):
+            TemplateID=Communication_Templates.objects.all()
+        else:
+            TemplateID=Communication_Templates.objects.filter(Commtype_id=t)
+        
+        #print "here2"
+        param_list_to_send=[]
+        for item in Communication_Templates.objects.all():
+            temp=[item.TemplateName,loads(item.paramList.decode("base64").decode("zip")) ]
+            param_list_to_send.append(temp)   
+        #print "here3"
+        return render_to_response('txCommunications/notice.htm',{'title':'Happenings@UIET','Users':user_,'CommType' :CommType, 'Template':TemplateID, 'paramlist': param_list_to_send},context_instance=RequestContext(request))
+    except:
+        return HttpResponse("error")
 
 def sendnotice(HttpRequest):
+    
     
     details={
                 'fromUserID': 1,
                 'ip':HttpRequest.META['REMOTE_ADDR'],
                 'subject':HttpRequest.POST['AdminNotices_subject'],
-                'message':HttpRequest.POST['AdminNotices_message']                
+                'message':HttpRequest.POST['AdminNotices_message'],
+                'type': HttpRequest.POST['AdminNotices_type'],
+                'timestamp_': datetime.now()                
              }
+    if(details["type"]=="UIETHappenings"):
+        details["timestamp_"]=(datetime.strptime(HttpRequest.POST["AdminNotices_date"], "%m/%d/%Y"))
+        
     
     print details 
     result= send_notice(details)
